@@ -1,8 +1,6 @@
 package com.tikal.hudson.plugins.notification;
 
 import hudson.model.Job;
-import hudson.plugins.notifier.model.BuildState;
-import hudson.plugins.notifier.model.JobState;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,6 +18,8 @@ import java.util.regex.MatchResult;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tikal.hudson.plugins.notification.model.BuildState;
+import com.tikal.hudson.plugins.notification.model.JobState;
 
 @SuppressWarnings("rawtypes")
 public enum Protocol {
