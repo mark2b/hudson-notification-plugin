@@ -9,6 +9,8 @@ import hudson.model.Job;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -16,14 +18,14 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-public class HudsonNotifierProperty extends JobProperty<AbstractProject<?, ?>> {
-
-	@DataBoundConstructor
-	public HudsonNotifierProperty() {
-		super();
-	}
+public class HudsonNotificationProperty extends JobProperty<AbstractProject<?, ?>> {
 
 	private List<Target> targets = new ArrayList<Target>();
+
+	@DataBoundConstructor
+	public HudsonNotificationProperty() {
+		super();
+	}
 
 	public List<Target> getTargets() {
 		return targets;
@@ -67,7 +69,16 @@ public class HudsonNotifierProperty extends JobProperty<AbstractProject<?, ?>> {
 	@Extension
 	public static final class DescriptorImpl extends JobPropertyDescriptor {
 
+		public DescriptorImpl() {
+			super(HudsonNotificationProperty.class);
+			load();
+		}
+
 		private List<Target> targets = new ArrayList<Target>();
+
+		public boolean isEnabled() {
+			return !targets.isEmpty();
+		}
 
 		public List<Target> getTargets() {
 			return targets;
@@ -77,30 +88,33 @@ public class HudsonNotifierProperty extends JobProperty<AbstractProject<?, ?>> {
 			this.targets = targets;
 		}
 
-		public DescriptorImpl() {
-			super(HudsonNotifierProperty.class);
-			load();
-		}
-
 		@Override
 		public boolean isApplicable(@SuppressWarnings("rawtypes") Class<? extends Job> jobType) {
 			return true;
 		}
 
 		public String getDisplayName() {
-			return "Hudson Notifier";
+			return "Hudson Job Notification";
 		}
 
 		@Override
-		public HudsonNotifierProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-			HudsonNotifierProperty notifierProperty = new HudsonNotifierProperty();
+		public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+			System.out.println(formData.toString(0));
+
+			HudsonNotificationProperty notificationProperty = new HudsonNotificationProperty();
 			if (formData != null && !formData.isNullObject()) {
-				JSONObject targetsData = (JSONObject) formData.get("targets");
-				if (targetsData != null && !targetsData.isNullObject()) {
-					notifierProperty.setTargets(req.bindJSONToList(Target.class, targetsData));
+				JSON targetsData = (JSON) formData.get("targets");
+				if (targetsData != null && !targetsData.isEmpty()) {
+					if (targetsData.isArray()) {
+						JSONArray targetsArrayData = (JSONArray) targetsData;
+						notificationProperty.setTargets(req.bindJSONToList(Target.class, targetsArrayData));
+					} else {
+						JSONObject targetsObjectData = (JSONObject) targetsData;
+						notificationProperty.getTargets().add(req.bindJSON(Target.class, targetsObjectData));
+					}
 				}
 			}
-			return notifierProperty;
+			return notificationProperty;
 		}
 
 		@Override

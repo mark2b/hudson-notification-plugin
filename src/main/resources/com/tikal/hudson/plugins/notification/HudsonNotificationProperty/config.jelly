@@ -1,0 +1,41 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+	<f:section title="Job Notifications">
+		<f:entry title="Notification Targets">
+			<f:repeatable name="targets" var="target" items="${instance.targets}"
+				add="${%Add Target}">
+				<table class="center-align">
+					<f:entry title="">
+						<table>
+							<tr>
+								<td>
+									<f:entry title="Protocol" description="">
+										<select class="setting-input" name="protocol">
+											<f:option value="UDP" selected="${target.protocol=='UDP'}">UDP</f:option>
+											<f:option value="TCP" selected="${target.protocol=='TCP'}">TCP</f:option>
+											<f:option value="HTTP" selected="${target.protocol=='HTTP'}">HTTP</f:option>
+										</select>
+									</f:entry>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<f:entry title="URL" description="Whether to send messages">
+										<f:textbox name="url" value="${target.url}" />
+									</f:entry>
+								</td>
+							</tr>
+							<tr class="group-row">
+								<td rowspan="1" valign="middle" class="pane">
+									<input type="button" value="${%Delete}" class="repeatable-delete"
+										style="margin-left: 1em;" />
+								</td>
+							</tr>
+						</table>
+					</f:entry>
+				</table>
+			</f:repeatable>
+		</f:entry>
+	</f:section>
+</j:jelly>

@@ -4,14 +4,14 @@ import hudson.model.Run;
 
 import java.util.List;
 
-import com.tikal.hudson.plugins.notification.HudsonNotifierProperty.Target;
+import com.tikal.hudson.plugins.notification.HudsonNotificationProperty.Target;
 
 public enum Phase {
 	STARTED, COMPLETED, FINISHED;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void handlePhase(Run run, String status) {
-		HudsonNotifierProperty property = (HudsonNotifierProperty) run.getParent().getProperty(HudsonNotifierProperty.class);
+		HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
 		if (property != null) {
 			List<Target> targets = property.getTargets();
 			for (Target target : targets) {
