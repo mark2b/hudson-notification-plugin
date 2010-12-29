@@ -1,0 +1,84 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jvnet.hudson.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>1.376</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<groupId>com.tikalk.hudson.plugins</groupId>
+	<artifactId>notification</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>hpi</packaging>
+	<name>Hudson Notification plugin</name>
+	<description>Sends notification about jobs phases</description>
+	<url>http://wiki.hudson-ci.org/display/HUDSON/Notification+Plugin</url>
+
+
+	<distributionManagement>
+		<repository>
+			<id>java.net-m2-repository</id>
+			<url>http://maven.hudson-labs.org/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>m.g.o-public</id>
+			<url>http://maven.glassfish.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>m.g.o-public</id>
+			<url>http://maven.glassfish.org/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+
+	<developers>
+		<developer>
+			<id>markb</id>
+			<name>Mark Berner</name>
+			<email>markb@tikalk.com</email>
+			<organization>Tikal Knowledge</organization>
+			<organizationUrl>http://tikalk.com</organizationUrl>
+		</developer>
+	</developers>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.jvnet.wagon-svn</groupId>
+				<artifactId>wagon-svn</artifactId>
+				<version>1.9</version>
+			</extension>
+		</extensions>
+	</build>
+	<scm>
+		<connection>scm:git:git://github.com/hudson/notification-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:hudson/notification-plugin.git</developerConnection>
+		<url>http://github.com/hudson/notification-plugin</url>
+	</scm>
+</project>
