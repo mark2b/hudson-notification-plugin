@@ -13,7 +13,6 @@ import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.StaplerRequest;
 
-import com.tikal.hudson.plugins.notification.HudsonNotificationProperty.Endpoint;
 
 @Extension
 public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescriptor {
@@ -46,29 +45,30 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
 		return "Hudson Job Notification";
 	}
 
-	@Override
-	public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-		System.out.println(formData.toString(0));
-
-		HudsonNotificationProperty notificationProperty = new HudsonNotificationProperty();
-		if (formData != null && !formData.isNullObject()) {
-			JSON endpointsData = (JSON) formData.get("endpoints");
-			if (endpointsData != null && !endpointsData.isEmpty()) {
-				if (endpointsData.isArray()) {
-					JSONArray endpointsArrayData = (JSONArray) endpointsData;
-					notificationProperty.setEndpoints(req.bindJSONToList(Endpoint.class, endpointsArrayData));
-				} else {
-					JSONObject endpointsObjectData = (JSONObject) endpointsData;
-					notificationProperty.getEndpoints().add(req.bindJSON(Endpoint.class, endpointsObjectData));
-				}
-			}
-		}
-		return notificationProperty;
-	}
+//	@Override
+//	public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+//		System.out.println(formData.toString(0));
+//
+//		HudsonNotificationProperty notificationProperty = new HudsonNotificationProperty();
+//		if (formData != null && !formData.isNullObject()) {
+//			JSON endpointsData = (JSON) formData.get("endpoints");
+//			if (endpointsData != null && !endpointsData.isEmpty()) {
+//				if (endpointsData.isArray()) {
+//					JSONArray endpointsArrayData = (JSONArray) endpointsData;
+//					notificationProperty.setEndpoints(req.bindJSONToList(Endpoint.class, endpointsArrayData));
+//				} else {
+//					JSONObject endpointsObjectData = (JSONObject) endpointsData;
+//					notificationProperty.getEndpoints().add(req.bindJSON(Endpoint.class, endpointsObjectData));
+//				}
+//			}
+//		}
+//		return notificationProperty;
+//	}
 
 	@Override
 	public boolean configure(StaplerRequest req, JSONObject formData) {
 		save();
 		return true;
 	}
+
 }

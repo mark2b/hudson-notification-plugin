@@ -4,7 +4,6 @@ import hudson.model.Run;
 
 import java.util.List;
 
-import com.tikal.hudson.plugins.notification.HudsonNotificationProperty.Endpoint;
 
 public enum Phase {
 	STARTED, COMPLETED, FINISHED;
