@@ -46,35 +46,35 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
 		return "Hudson Job Notification";
 	}
 
-	// @Override
-	// public HudsonNotificationProperty newInstance(StaplerRequest req,
-	// JSONObject formData) throws FormException {
-	// System.out.println(formData.toString(0));
-	//
-	// HudsonNotificationProperty notificationProperty = new
-	// HudsonNotificationProperty();
-	// if (formData != null && !formData.isNullObject()) {
-	// JSON endpointsData = (JSON) formData.get("endpoints");
-	// if (endpointsData != null && !endpointsData.isEmpty()) {
-	// if (endpointsData.isArray()) {
-	// JSONArray endpointsArrayData = (JSONArray) endpointsData;
-	// notificationProperty.setEndpoints(req.bindJSONToList(Endpoint.class,
-	// endpointsArrayData));
-	// } else {
-	// JSONObject endpointsObjectData = (JSONObject) endpointsData;
-	// notificationProperty.getEndpoints().add(req.bindJSON(Endpoint.class,
-	// endpointsObjectData));
-	// }
-	// }
-	// }
-	// return notificationProperty;
-	// }
-	public FormValidation doCheckurl(@QueryParameter(value = "url", fixEmpty = true) String url) {
-		System.out.println("HudsonNotificationProperty.Endpoint.doCheckURL()");
-		if (url.equals("111"))
+	@Override
+	public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+		System.out.println(formData.toString(0));
+
+		List<Endpoint> endpoints = new ArrayList<Endpoint>();
+		if (formData != null && !formData.isNullObject()) {
+			JSON endpointsData = (JSON) formData.get("endpoints");
+			if (endpointsData != null && !endpointsData.isEmpty()) {
+				if (endpointsData.isArray()) {
+					JSONArray endpointsArrayData = (JSONArray) endpointsData;
+					endpoints.addAll(req.bindJSONToList(Endpoint.class, endpointsArrayData));
+				} else {
+					JSONObject endpointsObjectData = (JSONObject) endpointsData;
+					endpoints.add(req.bindJSON(Endpoint.class, endpointsObjectData));
+				}
+			}
+		}
+		HudsonNotificationProperty notificationProperty = new HudsonNotificationProperty(endpoints);
+		return notificationProperty;
+	}
+
+	public FormValidation doCheckUrl(@QueryParameter(value = "url", fixEmpty = true) String url, @QueryParameter(value = "protocol") String protocolParameter) {
+		Protocol protocol = Protocol.valueOf(protocolParameter);
+		try {
+			protocol.validateUrl(url);
 			return FormValidation.ok();
-		else
-			return FormValidation.error("There's a problem here");
+		} catch (Exception e) {
+			return FormValidation.error(e.getMessage());
+		}
 	}
 
 	@Override

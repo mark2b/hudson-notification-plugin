@@ -1,6 +1,5 @@
 package com.tikal.hudson.plugins.notification;
 
-import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.Run;
 
@@ -34,6 +33,18 @@ public enum Protocol {
 				socket.send(packet);
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public void validateUrl(String url) {
+			try {
+				HostnamePort hnp = HostnamePort.parseUrl(url);
+				if (hnp == null) {
+					throw new Exception();
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Invalid Url: hostname:port");
 			}
 		}
 	},
@@ -70,6 +81,14 @@ public enum Protocol {
 				e.printStackTrace();
 			}
 		}
+
+		public void validateUrl(String url) {
+			try {
+				new URL(url);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException("Invalid Url: http://hostname:port/path");
+			}
+		}
 	};
 
 	private Gson gson = new GsonBuilder().create();
@@ -92,4 +111,15 @@ public enum Protocol {
 	}
 
 	abstract protected void send(String url, byte[] data);
+
+	public void validateUrl(String url) {
+		try {
+			HostnamePort hnp = HostnamePort.parseUrl(url);
+			if (hnp == null) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Invalid Url: hostname:port");
+		}
+	}
 }

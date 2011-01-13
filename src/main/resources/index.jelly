@@ -1,1 +1,5 @@
-<div>This plugin allows Hudson to send build notifications.</div>
+<div>
+	This plugin from
+	<a href="http://www.tikalk.com">Tikal Knowledge</a>
+	allows sending running Jobs status notifications.
+</div>
