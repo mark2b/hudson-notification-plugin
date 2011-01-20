@@ -1,10 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jvnet.hudson.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.391</version>
-		<relativePath>../pom.xml</relativePath>
+		<version>1.394</version>
 	</parent>
 
 	<groupId>com.tikalk.hudson.plugins</groupId>
@@ -14,13 +14,6 @@
 	<name>Hudson Notification plugin</name>
 	<description>Sends notifications about jobs phases and status</description>
 	<url>http://wiki.hudson-ci.org/display/HUDSON/Notification+Plugin</url>
-
-	<distributionManagement>
-		<repository>
-			<id>java.net-m2-repository</id>
-			<url>http://maven.hudson-labs.org:8081/content/repositories/releases/</url>
-		</repository>
-	</distributionManagement>
 
 	<repositories>
 		<repository>
