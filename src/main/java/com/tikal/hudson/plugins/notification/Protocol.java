@@ -1,6 +1,5 @@
 package com.tikal.hudson.plugins.notification;
 
-import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.Run;
 
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -26,7 +26,7 @@ public enum Protocol {
 
 	UDP {
 		@Override
-		protected void send(String url, byte[] data) {
+		public void send(String url, byte[] data) {
 			try {
 				HostnamePort hostnamePort = HostnamePort.parseUrl(url);
 				DatagramSocket socket = new DatagramSocket();
@@ -39,7 +39,7 @@ public enum Protocol {
 	},
 	TCP {
 		@Override
-		protected void send(String url, byte[] data) {
+		public void send(String url, byte[] data) {
 			try {
 				HostnamePort hostnamePort = HostnamePort.parseUrl(url);
 				SocketAddress endpoint = new InetSocketAddress(InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
@@ -56,14 +56,20 @@ public enum Protocol {
 	},
 	HTTP {
 		@Override
-		protected void send(String url, byte[] data) {
+		public void send(String url, byte[] data) {
 			try {
 				URL targetUrl = new URL(url);
 				URLConnection connection = targetUrl.openConnection();
-				OutputStream output = connection.getOutputStream();
-				output.write(data);
-				output.flush();
-				output.close();
+				if (connection instanceof HttpURLConnection) {
+					HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
+					httpURLConnection.setRequestMethod("PUT");
+					httpURLConnection.setDoOutput(true);
+					OutputStream output = httpURLConnection.getOutputStream();
+					output.write(data);
+					output.flush();
+					output.close();
+					httpURLConnection.getResponseCode();
+				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -91,5 +97,5 @@ public enum Protocol {
 		return gson.toJson(jobState).getBytes();
 	}
 
-	abstract protected void send(String url, byte[] data);
+	abstract public void send(String url, byte[] data);
 }
