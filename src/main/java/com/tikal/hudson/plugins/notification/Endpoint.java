@@ -41,4 +41,8 @@ public class Endpoint {
 			return FormValidation.error("There's a problem here");
 	}
 
+    @Override
+    public String toString() {
+        return protocol+":"+url;
+    }
 }

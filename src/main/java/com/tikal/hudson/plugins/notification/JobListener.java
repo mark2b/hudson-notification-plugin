@@ -16,17 +16,17 @@ public class JobListener extends RunListener<Run> {
 
 	@Override
 	public void onStarted(Run r, TaskListener listener) {
-		Phase.STARTED.handlePhase(r, getStatus(r));
+		Phase.STARTED.handlePhase(r, getStatus(r), listener);
 	}
 
 	@Override
 	public void onCompleted(Run r, TaskListener listener) {
-		Phase.COMPLETED.handlePhase(r, getStatus(r));
+		Phase.COMPLETED.handlePhase(r, getStatus(r), listener);
 	}
 
 	@Override
 	public void onFinalized(Run r) {
-		Phase.FINISHED.handlePhase(r, getStatus(r));
+		Phase.FINISHED.handlePhase(r, getStatus(r), TaskListener.NULL);
 	}
 
 	private String getStatus(Run r) {
