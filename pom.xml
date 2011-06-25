@@ -11,9 +11,9 @@
 	<artifactId>notification</artifactId>
 	<version>1.2-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<name>Hudson Notification plugin</name>
+	<name>Jenkins Notification plugin</name>
 	<description>Sends notifications about jobs phases and status</description>
-	<url>http://wiki.hudson-ci.org/display/HUDSON/Notification+Plugin</url>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin</url>
 
 	<repositories>
 		<repository>
@@ -47,29 +47,9 @@
 		</developer>
 	</developers>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.jvnet.wagon-svn</groupId>
-				<artifactId>wagon-svn</artifactId>
-				<version>1.9</version>
-			</extension>
-		</extensions>
-	</build>
 	<scm>
-		<connection>scm:git:git://github.com/hudson/notification-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:hudson/notification-plugin.git</developerConnection>
-		<url>http://github.com/hudson/notification-plugin</url>
+		<connection>scm:git:git://github.com/jenkinsci/notification-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:jenkinsci/notification-plugin.git</developerConnection>
+		<url>http://github.com/jenkinsci/notification-plugin</url>
 	</scm>
 </project>
