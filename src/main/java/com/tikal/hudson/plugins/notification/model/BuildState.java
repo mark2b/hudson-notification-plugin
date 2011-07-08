@@ -4,6 +4,8 @@ import com.tikal.hudson.plugins.notification.Phase;
 
 public class BuildState {
 
+	private String fullUrl;
+
 	private int number;
 
 	private Phase phase;
@@ -42,5 +44,13 @@ public class BuildState {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getFullUrl() {
+		return fullUrl;
+	}
+
+	public void setFullUrl(String fullUrl) {
+		this.fullUrl = fullUrl;
 	}
 }

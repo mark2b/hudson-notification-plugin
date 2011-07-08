@@ -16,6 +16,7 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tikal.hudson.plugins.notification.model.BuildState;
@@ -79,7 +80,8 @@ public enum Protocol {
 		}
 	};
 
-	private Gson gson = new GsonBuilder().create();
+	private Gson gson = new GsonBuilder().setFieldNamingPolicy(
+			FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
 	public void sendNotification(String url, Job job, Run run, Phase phase, String status) throws IOException {
 		send(url, buildMessage(job, run, phase, status));
@@ -94,6 +96,7 @@ public enum Protocol {
 		buildState.setUrl(run.getUrl());
 		buildState.setPhase(phase);
 		buildState.setStatus(status);
+		buildState.setFullUrl(run.getAbsoluteUrl());
 		jobState.setBuild(buildState);
 		return gson.toJson(jobState).getBytes();
 	}
