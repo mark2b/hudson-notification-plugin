@@ -21,7 +21,7 @@
 							</tr>
 							<tr>
 								<td>
-									<f:entry title="URL" description="Whether to send messages"
+									<f:entry title="URL" description="Where to send messages"
 										field="url">
 										<f:textbox name="url" value="${endpoint.url}" />
 									</f:entry>
