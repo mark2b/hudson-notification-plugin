@@ -96,7 +96,11 @@ public enum Protocol {
 		buildState.setUrl(run.getUrl());
 		buildState.setPhase(phase);
 		buildState.setStatus(status);
-		buildState.setFullUrl(run.getAbsoluteUrl());
+		try {
+			buildState.setFullUrl(run.getAbsoluteUrl());
+		} catch (IllegalStateException ignored) {
+			// Ignored
+		}
 		jobState.setBuild(buildState);
 		return gson.toJson(jobState).getBytes();
 	}
