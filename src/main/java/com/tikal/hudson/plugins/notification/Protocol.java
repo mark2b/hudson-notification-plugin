@@ -64,6 +64,10 @@ public enum Protocol {
 		protected void send(String url, byte[] data) throws IOException {
             URL targetUrl = new URL(url);
             URLConnection connection = targetUrl.openConnection();
+            if (connection instanceof HttpURLConnection)
+                ((HttpURLConnection) connection)
+                        .setFixedLengthStreamingMode(data.length);
+            connection.setDoInput(false);
             connection.setDoOutput(true);
             OutputStream output = connection.getOutputStream();
             output.write(data);
