@@ -2,6 +2,8 @@ package com.tikal.hudson.plugins.notification.model;
 
 import com.tikal.hudson.plugins.notification.Phase;
 
+import java.util.Map;
+
 public class BuildState {
 
 	private String fullUrl;
@@ -13,6 +15,8 @@ public class BuildState {
 	private String status;
 
 	private String url;
+	
+	private Map<String, String> parameters;
 
 	public int getNumber() {
 		return number;
@@ -52,5 +56,13 @@ public class BuildState {
 
 	public void setFullUrl(String fullUrl) {
 		this.fullUrl = fullUrl;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> params) {
+		this.parameters = params;
 	}
 }

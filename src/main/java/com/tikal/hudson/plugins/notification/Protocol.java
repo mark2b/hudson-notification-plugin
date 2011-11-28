@@ -1,6 +1,11 @@
 package com.tikal.hudson.plugins.notification;
 
+import hudson.EnvVars;
+import hudson.model.AbstractBuild;
 import hudson.model.Job;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
+import hudson.model.PasswordParameterValue;
 import hudson.model.Run;
 
 import java.io.IOException;
@@ -15,6 +20,8 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -106,6 +113,17 @@ public enum Protocol {
 			// Ignored
 		}
 		jobState.setBuild(buildState);
+
+		ParametersAction paramsAction = run.getAction(ParametersAction.class);
+		if (paramsAction != null && run instanceof AbstractBuild) {
+			AbstractBuild build = (AbstractBuild) run;
+			EnvVars env = new EnvVars();
+			for (ParameterValue value : paramsAction.getParameters())
+				if (!value.isSensitive())
+					value.buildEnvVars(build, env);
+			buildState.setParameters(env);
+		}
+
 		return gson.toJson(jobState).getBytes();
 	}
 
