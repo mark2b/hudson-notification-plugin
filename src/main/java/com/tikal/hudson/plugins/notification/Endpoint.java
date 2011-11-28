@@ -34,7 +34,6 @@ public class Endpoint {
 	}
 
 	public FormValidation doCheckURL(@QueryParameter(value = "url", fixEmpty = true) String url) {
-		System.out.println("HudsonNotificationProperty.Endpoint.doCheckURL()");
 		if (url.equals("111"))
 			return FormValidation.ok();
 		else

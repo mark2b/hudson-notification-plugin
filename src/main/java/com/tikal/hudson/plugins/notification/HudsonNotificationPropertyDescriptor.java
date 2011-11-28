@@ -48,7 +48,6 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
 
 	@Override
 	public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-		System.out.println(formData.toString(0));
 
 		List<Endpoint> endpoints = new ArrayList<Endpoint>();
 		if (formData != null && !formData.isNullObject()) {
