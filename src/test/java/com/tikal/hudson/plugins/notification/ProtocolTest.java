@@ -1,5 +1,5 @@
 /*
- * The MIT License
++ * The MIT License
  *
  * Copyright (c) 2011, CloudBees, Inc.
  *
