@@ -84,6 +84,7 @@ public enum Protocol {
             }
 
             HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             connection.setFixedLengthStreamingMode(data.length);
             connection.setDoInput(true);
             connection.setDoOutput(true);
