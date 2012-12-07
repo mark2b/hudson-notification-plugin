@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import com.google.common.base.Objects;
 import com.google.common.io.CharStreams;
@@ -59,7 +60,17 @@ public class ProtocolTest extends TestCase {
     private final String body;
 
     Request(HttpServletRequest request) throws IOException {
-      this(request.getRequestURL().toString(), request.getMethod(), CharStreams.toString(request.getReader()));
+      if (null == request.getHeader("Authorization")) {
+             this.url = request.getRequestURL().toString();
+      }
+      else {
+        String auth = request.getHeader("Authorization").split(" ")[1];
+        String b64UserInfo = auth;
+        String userInfo = new String(DatatypeConverter.parseBase64Binary(auth)) + "@";
+        this.url = request.getRequestURL().toString().replaceFirst("^http://", "http://" + userInfo);
+      }
+      this.method = request.getMethod();
+      this.body = CharStreams.toString(request.getReader());
     }
 
     Request(String url, String method, String body) {
@@ -142,6 +153,10 @@ public class ProtocolTest extends TestCase {
   }
 
   private UrlFactory startServer(Servlet servlet, String path) throws Exception {
+      return startSecureServer(servlet, path, "");
+  }
+
+  private UrlFactory startSecureServer(Servlet servlet, String path, String authority) throws Exception {
     SocketConnector connector = new SocketConnector();
     connector.setPort(0);
     connector.open();
@@ -156,8 +171,12 @@ public class ProtocolTest extends TestCase {
     server.start();
     servers.add(server);
 
-    final URL serverUrl = new URL(String.format("http://localhost:%d", connector.getLocalPort()));
-    return new UrlFactory() {
+    if (!authority.isEmpty()) {
+        authority += "@";
+    }
+
+   final URL serverUrl = new URL(String.format("http://" + authority + "localhost:%d", connector.getLocalPort()));
+   return new UrlFactory() {
       public String getUrl(String path) {
         try {
           return new URL(serverUrl, path).toExternalForm();
@@ -194,7 +213,23 @@ public class ProtocolTest extends TestCase {
     assertTrue(requests.isEmpty());
   }
 
-  public void testHttpPostWithRedirects() throws Exception {
+   public void testHttpPostWithBasicAuth() throws Exception {
+    BlockingQueue<Request> requests = new LinkedBlockingQueue<Request>();
+
+    UrlFactory urlFactory = startSecureServer(new RecordingServlet(requests), "/realpath", "fred:foo");
+
+    assertTrue(requests.isEmpty());
+
+    String uri = urlFactory.getUrl("/realpath");
+    Protocol.HTTP.send(uri, "Hello".getBytes());
+
+    // HttpServletRequests extract userInfo into Authorization header,
+    // so Request(HttpServletRequest) has reassembled it into uri
+    assertEquals(new Request(uri, "POST", "Hello"), requests.take());
+    assertTrue(requests.isEmpty());
+  }
+
+ public void testHttpPostWithRedirects() throws Exception {
     BlockingQueue<Request> requests = new LinkedBlockingQueue<Request>();
 
     UrlFactory urlFactory = startServer(new RecordingServlet(requests), "/realpath");
