@@ -90,9 +90,9 @@ public enum Protocol {
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             String userInfo = targetUrl.getUserInfo();
             if (null != userInfo) {
-                String b64UserInfo = DatatypeConverter.printBase64Binary(userInfo.getBytes());
-                String authorizationHeader = "Basic " + b64UserInfo;
-                connection.setRequestProperty("Authorization", authorizationHeader);
+              String b64UserInfo = DatatypeConverter.printBase64Binary(userInfo.getBytes());
+              String authorizationHeader = "Basic " + b64UserInfo;
+              connection.setRequestProperty("Authorization", authorizationHeader);
             }
             connection.setFixedLengthStreamingMode(data.length);
             connection.setDoInput(true);

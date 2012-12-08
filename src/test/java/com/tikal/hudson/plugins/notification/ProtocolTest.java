@@ -58,16 +58,19 @@ public class ProtocolTest extends TestCase {
     private final String url;
     private final String method;
     private final String body;
+    private final String userInfo;
 
     Request(HttpServletRequest request) throws IOException {
       if (null == request.getHeader("Authorization")) {
              this.url = request.getRequestURL().toString();
+             this.userInfo = null;
       }
       else {
         String auth = request.getHeader("Authorization").split(" ")[1];
         String b64UserInfo = auth;
         String userInfo = new String(DatatypeConverter.parseBase64Binary(auth)) + "@";
         this.url = request.getRequestURL().toString().replaceFirst("^http://", "http://" + userInfo);
+        this.userInfo = userInfo;
       }
       this.method = request.getMethod();
       this.body = CharStreams.toString(request.getReader());
@@ -77,6 +80,7 @@ public class ProtocolTest extends TestCase {
       this.url = url;
       this.method = method;
       this.body = body;
+      this.userInfo = null;
     }
 
     @Override
@@ -153,7 +157,7 @@ public class ProtocolTest extends TestCase {
   }
 
   private UrlFactory startServer(Servlet servlet, String path) throws Exception {
-      return startSecureServer(servlet, path, "");
+    return startSecureServer(servlet, path, "");
   }
 
   private UrlFactory startSecureServer(Servlet servlet, String path, String authority) throws Exception {
@@ -172,11 +176,11 @@ public class ProtocolTest extends TestCase {
     servers.add(server);
 
     if (!authority.isEmpty()) {
-        authority += "@";
+      authority += "@";
     }
 
-   final URL serverUrl = new URL(String.format("http://" + authority + "localhost:%d", connector.getLocalPort()));
-   return new UrlFactory() {
+    final URL serverUrl = new URL(String.format("http://%slocalhost:%d", authority, connector.getLocalPort()));
+    return new UrlFactory() {
       public String getUrl(String path) {
         try {
           return new URL(serverUrl, path).toExternalForm();
@@ -225,8 +229,10 @@ public class ProtocolTest extends TestCase {
 
     // HttpServletRequests extract userInfo into Authorization header,
     // so Request(HttpServletRequest) has reassembled it into uri
-    assertEquals(new Request(uri, "POST", "Hello"), requests.take());
+    Request theRequest = requests.take();
     assertTrue(requests.isEmpty());
+    assertEquals(new Request(uri, "POST", "Hello"), theRequest);
+    assertNotNull(theRequest);
   }
 
  public void testHttpPostWithRedirects() throws Exception {
