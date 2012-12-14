@@ -67,10 +67,8 @@ public class ProtocolTest extends TestCase {
       }
       else {
         String auth = request.getHeader("Authorization").split(" ")[1];
-        String b64UserInfo = auth;
-        String userInfo = new String(DatatypeConverter.parseBase64Binary(auth)) + "@";
-        this.url = request.getRequestURL().toString().replaceFirst("^http://", "http://" + userInfo);
-        this.userInfo = userInfo;
+        this.userInfo = new String(DatatypeConverter.parseBase64Binary(auth)) + "@";
+        this.url = request.getRequestURL().toString();
       }
       this.method = request.getMethod();
       this.body = CharStreams.toString(request.getReader());
@@ -106,6 +104,20 @@ public class ProtocolTest extends TestCase {
           .add("method", method)
           .add("body", body)
           .toString();
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public String getUrlWithAuthority() {
+      if (null == userInfo) {
+        // Detect possible bug: userInfo never moved from URI to Authorization header
+        return null;
+      }
+      else {
+        return url.replaceFirst("^http://", "http://" + userInfo);
+      }
     }
   }
 
@@ -231,8 +243,7 @@ public class ProtocolTest extends TestCase {
     // so Request(HttpServletRequest) has reassembled it into uri
     Request theRequest = requests.take();
     assertTrue(requests.isEmpty());
-    assertEquals(new Request(uri, "POST", "Hello"), theRequest);
-    assertNotNull(theRequest);
+    assertEquals(new Request(uri, "POST", "Hello").getUrl(), theRequest.getUrlWithAuthority());
   }
 
  public void testHttpPostWithRedirects() throws Exception {
