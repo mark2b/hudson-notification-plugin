@@ -61,17 +61,13 @@ public class ProtocolTest extends TestCase {
     private final String userInfo;
 
     Request(HttpServletRequest request) throws IOException {
-      if (null == request.getHeader("Authorization")) {
-             this.url = request.getRequestURL().toString();
-             this.userInfo = null;
-      }
-      else {
-        String auth = request.getHeader("Authorization").split(" ")[1];
-        this.userInfo = new String(DatatypeConverter.parseBase64Binary(auth)) + "@";
-        this.url = request.getRequestURL().toString();
-      }
+      this.url = request.getRequestURL().toString();
       this.method = request.getMethod();
       this.body = CharStreams.toString(request.getReader());
+      String auth = request.getHeader("Authorization");
+      this.userInfo = (null == auth) 
+              ? null
+              : new String(DatatypeConverter.parseBase64Binary(auth.split(" ")[1])) + "@";
     }
 
     Request(String url, String method, String body) {
@@ -239,8 +235,6 @@ public class ProtocolTest extends TestCase {
     String uri = urlFactory.getUrl("/realpath");
     Protocol.HTTP.send(uri, "Hello".getBytes());
 
-    // HttpServletRequests extract userInfo into Authorization header,
-    // so Request(HttpServletRequest) has reassembled it into uri
     Request theRequest = requests.take();
     assertTrue(requests.isEmpty());
     assertEquals(new Request(uri, "POST", "Hello").getUrl(), theRequest.getUrlWithAuthority());
