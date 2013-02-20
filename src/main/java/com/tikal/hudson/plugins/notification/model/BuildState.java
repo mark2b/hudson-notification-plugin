@@ -28,7 +28,9 @@ public class BuildState {
 	private String status;
 
 	private String url;
-	
+
+	private String displayName;
+
 	private Map<String, String> parameters;
 
 	public int getNumber() {
@@ -78,4 +80,12 @@ public class BuildState {
 	public void setParameters(Map<String, String> params) {
 		this.parameters = params;
 	}
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }
