@@ -81,11 +81,11 @@ public class BuildState {
 		this.parameters = params;
 	}
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
-    public String getDisplayName() {
-        return displayName;
-    }
+	public String getDisplayName() {
+		return displayName;
+	}
 }
