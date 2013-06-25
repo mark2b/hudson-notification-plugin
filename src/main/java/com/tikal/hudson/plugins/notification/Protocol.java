@@ -13,13 +13,6 @@
  */
 package com.tikal.hudson.plugins.notification;
 
-import hudson.EnvVars;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-import hudson.model.Job;
-import hudson.model.ParameterValue;
-import hudson.model.ParametersAction;
-import hudson.model.Run;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,6 +33,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
+import hudson.EnvVars;
+import hudson.model.AbstractBuild;
+import hudson.model.Hudson;
+import hudson.model.Job;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
+import hudson.model.Run;
 
 @SuppressWarnings("rawtypes")
 public enum Protocol {
@@ -132,6 +132,7 @@ public enum Protocol {
 			}
 		}
 	};
+
 
 	private Gson gson = new GsonBuilder().setFieldNamingPolicy(
 			FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
