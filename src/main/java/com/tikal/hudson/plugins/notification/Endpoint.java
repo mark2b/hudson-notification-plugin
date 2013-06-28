@@ -22,7 +22,11 @@ import org.kohsuke.stapler.QueryParameter;
 public class Endpoint {
 
 	private Protocol protocol;
-	private Format format;
+
+    /**
+     * json as default
+     */
+	private Format format = Format.JSON;
 
 	private String url;
 
@@ -50,6 +54,9 @@ public class Endpoint {
 	}
 	
 	public Format getFormat() {
+        if (this.format==null){
+            this.format = Format.JSON;
+        }
 		return format;
 	}
 	
