@@ -33,7 +33,7 @@ public enum Protocol {
 
 	UDP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
@@ -54,11 +54,12 @@ public enum Protocol {
 	},
 	TCP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             SocketAddress endpoint = new InetSocketAddress(InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
             Socket socket = new Socket();
-            socket.connect(endpoint);
+            socket.setSoTimeout(timeout);            
+            socket.connect(endpoint, timeout);
             OutputStream output = socket.getOutputStream();
             output.write(data);
             output.flush();
@@ -67,7 +68,7 @@ public enum Protocol {
 	},
 	HTTP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             URL targetUrl = new URL(url);
             if (!targetUrl.getProtocol().startsWith("http")) {
               throw new IllegalArgumentException("Not an http(s) url: " + url);
@@ -84,7 +85,8 @@ public enum Protocol {
             connection.setFixedLengthStreamingMode(data.length);
             connection.setDoInput(true);
             connection.setDoOutput(true);
-
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
             connection.connect();
             try {
               OutputStream output = connection.getOutputStream();
@@ -104,7 +106,7 @@ public enum Protocol {
               if (307 == connection.getResponseCode()) {
                 String location = connection.getHeaderField("Location");
                 connection.disconnect();
-                send(location, data);
+                send(location, data,timeout);
               } else {
                 connection.disconnect();
               }
@@ -121,7 +123,7 @@ public enum Protocol {
 	};
 
 
-	abstract protected void send(String url, byte[] data) throws IOException;
+	abstract protected void send(String url, byte[] data, int timeout) throws IOException;
 
 	public void validateUrl(String url) {
 		try {
