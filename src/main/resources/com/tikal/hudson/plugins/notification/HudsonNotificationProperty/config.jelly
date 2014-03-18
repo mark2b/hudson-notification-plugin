@@ -36,12 +36,18 @@
 										<f:textbox name="url" value="${endpoint.url}" />
 									</f:entry>
 								</td>
+							</tr>
+							<tr>
 								<td>
-									<f:repeatableDeleteButton value="${%Delete}" />
+									<f:entry title="Timeout" description="Timeout (in ms)"
+										field="timeout">
+										<f:textbox name="timeout" value="${endpoint.timeout}" />
+									</f:entry>
 								</td>
 							</tr>
 						</table>
 					</f:entry>
+					<f:repeatableDeleteButton value="${%Delete}" />
 				</table>
 			</f:repeatable>
 		</f:entry>

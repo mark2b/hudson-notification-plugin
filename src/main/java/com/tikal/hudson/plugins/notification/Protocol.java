@@ -28,25 +28,12 @@ import java.net.URL;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.tikal.hudson.plugins.notification.model.BuildState;
-import com.tikal.hudson.plugins.notification.model.JobState;
-import hudson.EnvVars;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-import hudson.model.Job;
-import hudson.model.ParameterValue;
-import hudson.model.ParametersAction;
-import hudson.model.Run;
 
-@SuppressWarnings("rawtypes")
 public enum Protocol {
 
 	UDP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
@@ -67,11 +54,12 @@ public enum Protocol {
 	},
 	TCP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             SocketAddress endpoint = new InetSocketAddress(InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
             Socket socket = new Socket();
-            socket.connect(endpoint);
+            socket.setSoTimeout(timeout);            
+            socket.connect(endpoint, timeout);
             OutputStream output = socket.getOutputStream();
             output.write(data);
             output.flush();
@@ -80,7 +68,7 @@ public enum Protocol {
 	},
 	HTTP {
 		@Override
-		protected void send(String url, byte[] data) throws IOException {
+		protected void send(String url, byte[] data, int timeout) throws IOException {
             URL targetUrl = new URL(url);
             if (!targetUrl.getProtocol().startsWith("http")) {
               throw new IllegalArgumentException("Not an http(s) url: " + url);
@@ -97,7 +85,8 @@ public enum Protocol {
             connection.setFixedLengthStreamingMode(data.length);
             connection.setDoInput(true);
             connection.setDoOutput(true);
-
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
             connection.connect();
             try {
               OutputStream output = connection.getOutputStream();
@@ -117,7 +106,7 @@ public enum Protocol {
               if (307 == connection.getResponseCode()) {
                 String location = connection.getHeaderField("Location");
                 connection.disconnect();
-                send(location, data);
+                send(location, data,timeout);
               } else {
                 connection.disconnect();
               }
@@ -134,45 +123,7 @@ public enum Protocol {
 	};
 
 
-	private Gson gson = new GsonBuilder().setFieldNamingPolicy(
-			FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
-	public void sendNotification(String url, Job job, Run run, Phase phase, String status) throws IOException {
-		send(url, buildMessage(job, run, phase, status));
-	}
-
-	private byte[] buildMessage(Job job, Run run, Phase phase, String status) {
-		JobState jobState = new JobState();
-		jobState.setName(job.getName());
-		jobState.setUrl(job.getUrl());
-		BuildState buildState = new BuildState();
-		buildState.setNumber(run.number);
-		buildState.setUrl(run.getUrl());
-		buildState.setPhase(phase);
-		buildState.setStatus(status);
-		buildState.setDisplayName(run.getDisplayName());
-
-		String rootUrl = Hudson.getInstance().getRootUrl();
-		if (rootUrl != null) {
-			buildState.setFullUrl(rootUrl + run.getUrl());
-		}
-
-		jobState.setBuild(buildState);
-
-		ParametersAction paramsAction = run.getAction(ParametersAction.class);
-		if (paramsAction != null && run instanceof AbstractBuild) {
-			AbstractBuild build = (AbstractBuild) run;
-			EnvVars env = new EnvVars();
-			for (ParameterValue value : paramsAction.getParameters())
-				if (!value.isSensitive())
-					value.buildEnvVars(build, env);
-			buildState.setParameters(env);
-		}
-
-		return gson.toJson(jobState).getBytes();
-	}
-
-	abstract protected void send(String url, byte[] data) throws IOException;
+	abstract protected void send(String url, byte[] data, int timeout) throws IOException;
 
 	public void validateUrl(String url) {
 		try {

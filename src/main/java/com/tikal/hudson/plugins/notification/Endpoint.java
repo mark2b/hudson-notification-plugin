@@ -21,6 +21,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 public class Endpoint {
 
+	public static final Integer DEFAULT_TIMEOUT = 30000;
+
 	private Protocol protocol;
 
     /**
@@ -29,12 +31,23 @@ public class Endpoint {
 	private Format format = Format.JSON;
 
 	private String url;
+	
+	private Integer timeout = DEFAULT_TIMEOUT;
 
 	@DataBoundConstructor
-	public Endpoint(Protocol protocol, String url, Format format) {
+	public Endpoint(Protocol protocol, String url, Format format, Integer timeout) {
 		this.protocol = protocol;
 		this.url = url;
 		this.format = format;
+		this.setTimeout(timeout);
+	}
+
+	public int getTimeout() {
+		return timeout == null ? DEFAULT_TIMEOUT : timeout;
+	}
+	
+	public void setTimeout(Integer timeout) {
+		this.timeout =  timeout;		
 	}
 
 	public Protocol getProtocol() {
