@@ -15,74 +15,88 @@
 package com.tikal.hudson.plugins.notification;
 
 import hudson.util.FormValidation;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 public class Endpoint {
 
-	public static final Integer DEFAULT_TIMEOUT = 30000;
+    public static final Integer DEFAULT_TIMEOUT = 30000;
 
-	private Protocol protocol;
+    private Protocol protocol;
 
     /**
      * json as default
      */
-	private Format format = Format.JSON;
+    private Format format = Format.JSON;
 
-	private String url;
-	
-	private Integer timeout = DEFAULT_TIMEOUT;
+    private String url;
 
-	@DataBoundConstructor
-	public Endpoint(Protocol protocol, String url, Format format, Integer timeout) {
-		this.protocol = protocol;
-		this.url = url;
-		this.format = format;
-		this.setTimeout(timeout);
-	}
+    private String event = "all";
 
-	public int getTimeout() {
-		return timeout == null ? DEFAULT_TIMEOUT : timeout;
-	}
-	
-	public void setTimeout(Integer timeout) {
-		this.timeout =  timeout;		
-	}
+    private Integer timeout = DEFAULT_TIMEOUT;
 
-	public Protocol getProtocol() {
-		return protocol;
-	}
+    @DataBoundConstructor
+    public Endpoint(Protocol protocol, String url, String event, Format format, Integer timeout) {
+        setProtocol( protocol );
+        setUrl( url );
+        setEvent( event );
+        setFormat( format );
+        setTimeout( timeout );
+    }
 
-	public void setProtocol(Protocol protocol) {
-		this.protocol = protocol;
-	}
+    public int getTimeout() {
+        return timeout == null ? DEFAULT_TIMEOUT : timeout;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setTimeout(Integer timeout) {
+        this.timeout =  timeout;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	
-	public Format getFormat() {
+    public Protocol getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getEvent (){
+        return event;
+    }
+
+    public void setEvent ( String event ){
+        this.event = event;
+    }
+
+    public Format getFormat() {
         if (this.format==null){
             this.format = Format.JSON;
         }
-		return format;
-	}
-	
-	public void setFormat(Format format) {
-		this.format = format;
-	}
+        return format;
+    }
 
-	public FormValidation doCheckURL(@QueryParameter(value = "url", fixEmpty = true) String url) {
-		if (url.equals("111"))
-			return FormValidation.ok();
-		else
-			return FormValidation.error("There's a problem here");
-	}
+    public void setFormat(Format format) {
+        this.format = format;
+    }
+
+    public FormValidation doCheckURL(@QueryParameter(value = "url", fixEmpty = true) String url) {
+        if (url.equals("111"))
+            return FormValidation.ok();
+        else
+            return FormValidation.error("There's a problem here");
+    }
+
+    public boolean isJson() {
+        return getFormat() == Format.JSON;
+    }
 
     @Override
     public String toString() {

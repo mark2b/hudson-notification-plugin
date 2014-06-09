@@ -1,55 +1,66 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-	<f:section title="Job Notifications">
-		<f:entry title="Notification Endpoints" field="endpoints">
-			<f:repeatable name="endpoints" var="endpoint"
-				items="${instance.endpoints}" add="${%Add Endpoint}">
-				<table class="center-align">
-					<f:entry field="endpoint">
-						<table>
-							<tr>
-								<td>
-									<f:entry title="Format" description="" field="format">
-										<select class="setting-input" name="format">
-											<f:option value="JSON" selected="${endpoint.format=='JSON'}">JSON</f:option>
-											<f:option value="XML" selected="${endpoint.format=='XML'}">XML</f:option>
-										</select>
-									</f:entry>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<f:entry title="Protocol" description="" field="protocol">
-										<select class="setting-input" name="protocol">
-											<f:option value="UDP" selected="${endpoint.protocol=='UDP'}">UDP</f:option>
-											<f:option value="TCP" selected="${endpoint.protocol=='TCP'}">TCP</f:option>
-											<f:option value="HTTP" selected="${endpoint.protocol=='HTTP'}">HTTP</f:option>
-										</select>
-									</f:entry>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<f:entry title="URL" description="Where to send messages"
-										field="url">
-										<f:textbox name="url" value="${endpoint.url}" />
-									</f:entry>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<f:entry title="Timeout" description="Timeout (in ms)"
-										field="timeout">
-										<f:textbox name="timeout" value="${endpoint.timeout}" />
-									</f:entry>
-								</td>
-							</tr>
-						</table>
-					</f:entry>
-					<f:repeatableDeleteButton value="${%Delete}" />
-				</table>
-			</f:repeatable>
-		</f:entry>
-	</f:section>
+    <f:section title="Job Notifications">
+        <f:entry title="Notification Endpoints" field="endpoints">
+            <f:repeatable name="endpoints" var="endpoint"
+                items="${instance.endpoints}" add="${%Add Endpoint}">
+                <table class="center-align">
+                    <f:entry field="endpoint">
+                        <table>
+                            <tr>
+                                <td>
+                                    <f:entry title="Format" description="" field="format">
+                                        <select class="setting-input" name="format">
+                                            <f:option value="JSON" selected="${endpoint.format=='JSON'}">JSON</f:option>
+                                            <f:option value="XML" selected="${endpoint.format=='XML'}">XML</f:option>
+                                        </select>
+                                    </f:entry>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Protocol" description="" field="protocol">
+                                        <select class="setting-input" name="protocol">
+                                            <f:option value="HTTP" selected="${endpoint.protocol=='HTTP'}">HTTP</f:option>
+                                            <f:option value="TCP" selected="${endpoint.protocol=='TCP'}">TCP</f:option>
+                                            <f:option value="UDP" selected="${endpoint.protocol=='UDP'}">UDP</f:option>
+                                        </select>
+                                    </f:entry>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Event" description="Job lifecycle event triggering notification" field="event">
+                                        <select class="setting-input" name="event">
+                                            <f:option value="all"       selected="${endpoint.event == 'all'}">All Events</f:option>
+                                            <f:option value="started"   selected="${endpoint.event == 'started'}">Job Started</f:option>
+                                            <f:option value="completed" selected="${endpoint.event == 'completed'}">Job Completed</f:option>
+                                            <f:option value="finalized" selected="${endpoint.event == 'finalized'}">Job Finalized</f:option>
+                                        </select>
+                                    </f:entry>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="URL" description="Where to send messages" field="url">
+                                        <f:textbox name="url" value="${endpoint.url}" />
+                                    </f:entry>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Timeout" description="Timeout (in ms)"
+                                        field="timeout">
+                                        <f:textbox name="timeout" value="${endpoint.timeout}" default="${descriptor.defaultTimeout}"/>
+                                    </f:entry>
+                                </td>
+                            </tr>
+                        </table>
+                    </f:entry>
+                    <f:repeatableDeleteButton value="${%Delete}" />
+                </table>
+            </f:repeatable>
+        </f:entry>
+    </f:section>
 </j:jelly>
