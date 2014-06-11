@@ -22,23 +22,23 @@ import hudson.model.listeners.RunListener;
 @SuppressWarnings("rawtypes")
 public class JobListener extends RunListener<Run> {
 
-	public JobListener() {
-		super(Run.class);
-	}
+    public JobListener() {
+        super(Run.class);
+    }
 
-	@Override
-	public void onStarted(Run r, TaskListener listener) {
-		Phase.STARTED.handle(r, listener);
-	}
+    @Override
+    public void onStarted(Run r, TaskListener listener) {
+        Phase.STARTED.handle(r, listener);
+    }
 
-	@Override
-	public void onCompleted(Run r, TaskListener listener) {
-		Phase.COMPLETED.handle(r, listener);
-	}
+    @Override
+    public void onCompleted(Run r, TaskListener listener) {
+        Phase.COMPLETED.handle(r, listener);
+    }
 
-	@Override
-	public void onFinalized(Run r) {
-		Phase.FINISHED.handle(r, TaskListener.NULL);
-	}
+    @Override
+    public void onFinalized(Run r) {
+        Phase.FINALIZED.handle(r, TaskListener.NULL);
+    }
 
 }

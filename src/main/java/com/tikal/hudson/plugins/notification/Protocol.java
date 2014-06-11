@@ -14,68 +14,47 @@
 package com.tikal.hudson.plugins.notification;
 
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
-
-import javax.xml.bind.DatatypeConverter;
+import java.net.*;
 
 
 public enum Protocol {
 
-	UDP {
-		@Override
-		protected void send(String url, byte[] data, int timeout) throws IOException {
+    UDP {
+        @Override
+        protected void send(String url, byte[] data, int timeout, boolean isJson) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
             socket.send(packet);
-		}
-
-		@Override
-		public void validateUrl(String url) {
-			try {
-				HostnamePort hnp = HostnamePort.parseUrl(url);
-				if (hnp == null) {
-					throw new Exception();
-				}
-			} catch (Exception e) {
-				throw new RuntimeException("Invalid Url: hostname:port");
-			}
-		}
-	},
-	TCP {
-		@Override
-		protected void send(String url, byte[] data, int timeout) throws IOException {
+        }
+    },
+    TCP {
+        @Override
+        protected void send(String url, byte[] data, int timeout, boolean isJson) throws IOException {
             HostnamePort hostnamePort = HostnamePort.parseUrl(url);
             SocketAddress endpoint = new InetSocketAddress(InetAddress.getByName(hostnamePort.hostname), hostnamePort.port);
             Socket socket = new Socket();
-            socket.setSoTimeout(timeout);            
+            socket.setSoTimeout(timeout);
             socket.connect(endpoint, timeout);
             OutputStream output = socket.getOutputStream();
             output.write(data);
             output.flush();
             output.close();
-		}
-	},
-	HTTP {
-		@Override
-		protected void send(String url, byte[] data, int timeout) throws IOException {
+        }
+    },
+    HTTP {
+        @Override
+        protected void send(String url, byte[] data, int timeout, boolean isJson) throws IOException {
             URL targetUrl = new URL(url);
             if (!targetUrl.getProtocol().startsWith("http")) {
               throw new IllegalArgumentException("Not an http(s) url: " + url);
             }
 
             HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
-            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            connection.setRequestProperty("Content-Type", String.format( "application/%s;charset=UTF-8", isJson ? "json" : "xml" ));
             String userInfo = targetUrl.getUserInfo();
             if (null != userInfo) {
               String b64UserInfo = DatatypeConverter.printBase64Binary(userInfo.getBytes());
@@ -106,33 +85,41 @@ public enum Protocol {
               if (307 == connection.getResponseCode()) {
                 String location = connection.getHeaderField("Location");
                 connection.disconnect();
-                send(location, data,timeout);
+                send(location, data,timeout, isJson);
               } else {
                 connection.disconnect();
               }
             }
-		}
+        }
 
-		public void validateUrl(String url) {
-			try {
-				new URL(url);
-			} catch (MalformedURLException e) {
-				throw new RuntimeException("Invalid Url: http://hostname:port/path");
-			}
-		}
-	};
+        @Override
+        public void validateUrl( String url ) {
+            try {
+                // noinspection ResultOfObjectAllocationIgnored
+                new URL( url );
+            } catch ( MalformedURLException e ) {
+                throw new RuntimeException( String.format( "%sUse http://hostname:port/path for endpoint URL",
+                                                           isEmpty ( url ) ? "" : "Invalid URL '" + url + "'. " ));
+            }
+        }
+    };
 
 
-	abstract protected void send(String url, byte[] data, int timeout) throws IOException;
+    protected abstract void send(String url, byte[] data, int timeout, boolean isJson) throws IOException;
 
-	public void validateUrl(String url) {
-		try {
-			HostnamePort hnp = HostnamePort.parseUrl(url);
-			if (hnp == null) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Invalid Url: hostname:port");
-		}
-	}
+    public void validateUrl(String url) {
+        try {
+            HostnamePort hnp = HostnamePort.parseUrl(url);
+            if (hnp == null) {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException( String.format( "%sUse hostname:port for endpoint URL",
+                                                       isEmpty ( url ) ? "" : "Invalid URL '" + url + "'. " ));
+        }
+    }
+
+    private static boolean isEmpty( String s ) {
+        return (( s == null ) || ( s.trim().length() < 1 ));
+    }
 }

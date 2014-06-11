@@ -13,77 +13,118 @@
  */
 package com.tikal.hudson.plugins.notification;
 
-import hudson.EnvVars;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-import hudson.model.Job;
-import hudson.model.ParameterValue;
-import hudson.model.ParametersAction;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-
-import java.io.IOException;
-import java.util.List;
-
 import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
+import com.tikal.hudson.plugins.notification.model.ScmState;
+import hudson.EnvVars;
+import hudson.model.*;
+import jenkins.model.Jenkins;
+
+import java.io.IOException;
+import java.util.*;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public enum Phase {
-	STARTED, COMPLETED, FINISHED;
+    STARTED, COMPLETED, FINALIZED;
 
-	public void handle(Run run, TaskListener listener) {
-		HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
-		if (property != null) {
-			List<Endpoint> targets = property.getEndpoints();
-			for (Endpoint target : targets) {
+    @SuppressWarnings( "CastToConcreteClass" )
+    public void handle(Run run, TaskListener listener) {
+
+        HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
+        if ( property == null ){ return; }
+
+        for ( Endpoint target : property.getEndpoints()) {
+            if ( isRun( target )) {
+                listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
+
                 try {
-                    JobState jobState = buildJobState(run.getParent(), run);
-					target.getProtocol().send(target.getUrl(), target.getFormat().serialize(jobState), target.getTimeout());
-                } catch (IOException e) {
-                    e.printStackTrace(listener.error("Failed to notify "+target));
+                    JobState jobState = buildJobState(run.getParent(), run, listener);
+                    target.getProtocol().send(target.getUrl(),
+                                              target.getFormat().serialize(jobState),
+                                              target.getTimeout(),
+                                              target.isJson());
+                } catch (Throwable error) {
+                    error.printStackTrace( listener.error( String.format( "Failed to notify endpoint '%s'", target )));
+                    listener.getLogger().println( String.format( "Failed to notify endpoint '%s' - %s: %s",
+                                                                 target, error.getClass().getName(), error.getMessage()));
                 }
             }
-		}
-	}
-	
-	private JobState buildJobState(Job job, Run run) {
-		JobState jobState = new JobState();
-		jobState.setName(job.getName());
-		jobState.setUrl(job.getUrl());
-		BuildState buildState = new BuildState();
-		buildState.setNumber(run.number);
-		buildState.setUrl(run.getUrl());
-		buildState.setPhase(this);
-		buildState.setStatus(getStatus(run));
+        }
+    }
 
-		String rootUrl = Hudson.getInstance().getRootUrl();
-		if (rootUrl != null) {
-			buildState.setFullUrl(rootUrl + run.getUrl());
-		}
 
-		jobState.setBuild(buildState);
+    /**
+     * Determines if the endpoint specified should be notified at the current job phase.
+     */
+    private boolean isRun( Endpoint endpoint ) {
+        String event = endpoint.getEvent();
+        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()));
+    }
 
-		ParametersAction paramsAction = run.getAction(ParametersAction.class);
-		if (paramsAction != null && run instanceof AbstractBuild) {
-			AbstractBuild build = (AbstractBuild) run;
-			EnvVars env = new EnvVars();
-			for (ParameterValue value : paramsAction.getParameters())
-				if (!value.isSensitive())
-					value.buildEnvVars(build, env);
-			buildState.setParameters(env);
-		}
-		
-		return jobState;
-	}
-	
-	private String getStatus(Run r) {
-		Result result = r.getResult();
-		String status = null;
-		if (result != null) {
-			status = result.toString();
-		}
-		return status;
-	}
+    private JobState buildJobState(Job job, Run run, TaskListener listener)
+        throws IOException, InterruptedException
+    {
+
+        Jenkins            jenkins      = Jenkins.getInstance();
+        String             rootUrl      = jenkins.getRootUrl();
+        JobState           jobState     = new JobState();
+        BuildState         buildState   = new BuildState();
+        ScmState           scmState     = new ScmState();
+        Result             result       = run.getResult();
+        ParametersAction   paramsAction = run.getAction(ParametersAction.class);
+        List<Run.Artifact> artifacts    = run.getArtifacts();
+        EnvVars            environment  = run.getEnvironment( listener );
+
+        jobState.setName( job.getName());
+        jobState.setUrl( job.getUrl());
+        jobState.setBuild( buildState );
+
+        buildState.setNumber( run.number );
+        buildState.setUrl( run.getUrl());
+        buildState.setPhase( this );
+        buildState.setScm( scmState );
+
+        if ( result != null ) {
+            buildState.setStatus(result.toString());
+        }
+
+        if ( rootUrl != null ) {
+            buildState.setFullUrl(rootUrl + run.getUrl());
+        }
+
+        if ( artifacts != null ) {
+            Map<String, List<String>> urls = new HashMap<String, List<String>>( artifacts.size());
+            for ( Run.Artifact a : artifacts ) {
+                final String artifactUrl = jenkins.getRootUrl() + run.getUrl() + "artifact/" + a.getHref();
+                urls.put( a.getFileName(), new ArrayList<String>(){{ add( artifactUrl ); }});
+            }
+            buildState.setArtifacts( urls );
+        }
+
+        buildState.updateArtifacts( job, run );
+
+        if ( paramsAction != null ) {
+            EnvVars env = new EnvVars();
+            for (ParameterValue value : paramsAction.getParameters()){
+                if ( ! value.isSensitive()) {
+                    value.buildEnvironment( run, env );
+                }
+            }
+            buildState.setParameters(env);
+        }
+
+        if ( environment.get( "GIT_URL" ) != null ) {
+            scmState.setUrl( environment.get( "GIT_URL" ));
+        }
+
+        if ( environment.get( "GIT_BRANCH" ) != null ) {
+            scmState.setBranch( environment.get( "GIT_BRANCH" ));
+        }
+
+        if ( environment.get( "GIT_COMMIT" ) != null ) {
+            scmState.setCommit( environment.get( "GIT_COMMIT" ));
+        }
+
+        return jobState;
+    }
 }
