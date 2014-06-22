@@ -146,7 +146,7 @@ public class BuildState {
         @SuppressWarnings( "unchecked" )
         List<Run.Artifact> buildArtifacts = run.getArtifacts();
 
-        if (( buildArtifacts == null ) || buildArtifacts.isEmpty()) { return; }
+        if ( buildArtifacts == null ) { return; }
 
         for ( Run.Artifact a : buildArtifacts ) {
             String artifactUrl = Jenkins.getInstance().getRootUrl() + run.getUrl() + "artifact/" + a.getHref();
@@ -157,8 +157,9 @@ public class BuildState {
 
     private void updateS3Artifacts ( Job job, Run run )
     {
-        if ( ! ( run instanceof AbstractBuild )){ return; }
         if ( Jenkins.getInstance().getPlugin( "s3" ) == null ) { return; }
+        if ( ! ( run instanceof AbstractBuild )){ return; }
+        if ( isEmpty( job.getName())){ return; }
 
         DescribableList   publishers  = (( AbstractBuild ) run ).getProject().getPublishersList();
         S3BucketPublisher s3Publisher = ( S3BucketPublisher ) publishers.get( S3BucketPublisher.class );
@@ -167,7 +168,7 @@ public class BuildState {
 
         for ( Entry entry : s3Publisher.getEntries()) {
 
-            if ( isEmpty( job.getName(), entry.sourceFile, entry.selectedRegion, entry.bucket )){ continue; }
+            if ( isEmpty( entry.sourceFile, entry.selectedRegion, entry.bucket )){ continue; }
             String fileName = new File( entry.sourceFile ).getName();
             if ( isEmpty( fileName )){ continue; }
 
@@ -187,6 +188,13 @@ public class BuildState {
     }
 
 
+    /**
+     * Updates an artifact URL.
+     *
+     * @param fileName     artifact file name
+     * @param locationName artifact location name, like "s3" or "archive"
+     * @param locationUrl  artifact URL at the location specified
+     */
     private void updateArtifact( String fileName, String locationName, String locationUrl )
     {
         verifyNotEmpty( fileName, locationName, locationUrl );
@@ -197,7 +205,8 @@ public class BuildState {
 
         if ( artifacts.get( fileName ).containsKey( locationName )) {
             throw new RuntimeException( String.format(
-                "Artifacts Map already contains location '%s': %s", locationName, artifacts ));
+                "Adding artifacts mapping '%s/%s/%s' - artifacts Map already contains mapping of location '%s': %s",
+                fileName, locationName, locationUrl, locationName, artifacts ));
         }
 
         artifacts.get( fileName ).put( locationName, locationUrl );
