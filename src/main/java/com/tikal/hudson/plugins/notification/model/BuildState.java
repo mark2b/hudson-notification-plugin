@@ -48,17 +48,15 @@ public class BuildState {
 
     /**
      *  Map of artifacts: file name => Map of artifact locations ( location name => artifact URL )
-     *  "artifacts": {
-          "notification.jar": {
-            "archive": "http://localhost:8080/job/notification-plugin/54/artifact/target/notification.jar"
-          },
-          "notification.hpi": {
-            "s3": "https://s3-eu-west-1.amazonaws.com/notification-plugin/jobs/notification-plugin/54/notification.hpi",
-            "archive": "http://localhost:8080/job/notification-plugin/54/artifact/target/notification.hpi"
-          }
-        }
+     *  ---
+     *  artifacts:
+     *   notification.hpi:
+     *     s3: https://s3-eu-west-1.amazonaws.com/evgenyg-bakery-artifacts/jobs/notification-plugin/78/notification.hpi
+     *     archive: http://localhost:8080/job/notification-plugin/78/artifact/target/notification.hpi
+     *   notification.jar:
+     *     archive: http://localhost:8080/job/notification-plugin/78/artifact/target/notification.jar
      */
-    private Map<String, Map<String, String>> artifacts = new HashMap<String, Map<String, String>>();
+    private final Map<String, Map<String, String>> artifacts = new HashMap<String, Map<String, String>>();
 
     public int getNumber() {
         return number;
