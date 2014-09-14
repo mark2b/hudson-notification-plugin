@@ -13,7 +13,7 @@ dependencies:
     - ~/.m2
 test:
   override:
-    - 
+    - id
 general:
   artifacts:
     - target/notification.hpi
