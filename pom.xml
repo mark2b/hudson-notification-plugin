@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tikalk.hudson.plugins</groupId>
     <artifactId>notification</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.7-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins Notification plugin</name>
     <description>Sends notifications about jobs phases and status</description>
@@ -101,8 +101,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/notification-plugin.git</connection>
-        <developerConnection>scm:git:ssh@github.com:jenkinsci/notification-plugin.git</developerConnection>
+        <connection>scm:git:git://github.com/jenkinsci/notification-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/notification-plugin.git</developerConnection>
         <url>http://github.com/jenkinsci/notification-plugin</url>
     </scm>
 
