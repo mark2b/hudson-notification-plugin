@@ -11,6 +11,8 @@ dependencies:
     - mvn -s settings.xml clean package
   cache_directories:
     - ~/.m2
+test:
+  override:
 general:
   artifacts:
     - target/notification.hpi
