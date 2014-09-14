@@ -8,7 +8,7 @@ machine:
     version: oraclejdk7
 dependencies:
   override:
-    - mvn -s settings.xml package
+    - mvn -s settings.xml package -Dmaven.test.skip=true
   cache_directories:
     - ~/.m2
 test:
