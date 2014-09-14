@@ -1,5 +1,7 @@
+# -----------------------------------------
 # https://circleci.com/docs/configuration
 # https://circleci.com/docs/environment
+# -----------------------------------------
 
 machine:
   java:
@@ -7,11 +9,11 @@ machine:
 dependencies:
   override:
     - mvn -s settings.xml clean
-  cache_directories:
-    - ~/.m2
 test:
   override:
     - mvn -s settings.xml clean package
+  cache_directories:
+    - ~/.m2
 general:
   artifacts:
     - target/notification.hpi
