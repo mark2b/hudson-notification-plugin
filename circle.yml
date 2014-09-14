@@ -8,12 +8,9 @@ machine:
     version: oraclejdk7
 dependencies:
   override:
-    - mvn -s settings.xml dependency:go-offline
+    - mvn -s settings.xml clean package
   cache_directories:
     - ~/.m2
-test:
-  override:
-    - mvn -s settings.xml clean package
 general:
   artifacts:
     - target/notification.hpi
