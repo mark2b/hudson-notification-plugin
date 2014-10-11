@@ -46,6 +46,8 @@ public class BuildState {
 
     private Map<String, String> parameters;
 
+    private String log;
+
     /**
      *  Map of artifacts: file name => Map of artifact locations ( location name => artifact URL )
      *  ---
@@ -128,6 +130,13 @@ public class BuildState {
         this.scm = scmState;
     }
 
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
+    }
 
     /**
      * Updates artifacts Map with S3 links, if corresponding publisher is available.

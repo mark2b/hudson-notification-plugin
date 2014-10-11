@@ -73,6 +73,7 @@ public enum Phase {
         Result             result       = run.getResult();
         ParametersAction   paramsAction = run.getAction(ParametersAction.class);
         EnvVars            environment  = run.getEnvironment( listener );
+        String             log          = run.getLog();
 
         jobState.setName( job.getName());
         jobState.setUrl( job.getUrl());
@@ -82,6 +83,7 @@ public enum Phase {
         buildState.setUrl( run.getUrl());
         buildState.setPhase( this );
         buildState.setScm( scmState );
+        buildState.setLog( log );
 
         if ( result != null ) {
             buildState.setStatus(result.toString());
