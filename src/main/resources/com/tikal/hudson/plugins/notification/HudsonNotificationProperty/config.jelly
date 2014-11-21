@@ -56,6 +56,14 @@
                                     </f:entry>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Log" description="Number lines of log messages to send. Use -1 for all (use with caution)."
+                                        field="loglines">
+                                        <f:textbox name="loglines" value="${endpoint.loglines}" default="0" />
+                                    </f:entry>
+                                </td>
+                            </tr>
                         </table>
                     </f:entry>
                     <f:repeatableDeleteButton value="${%Delete}" />
