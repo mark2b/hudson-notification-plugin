@@ -74,7 +74,7 @@ public enum Phase {
         Result             result       = run.getResult();
         ParametersAction   paramsAction = run.getAction(ParametersAction.class);
         EnvVars            environment  = run.getEnvironment( listener );
-        String             log          = this.getLog(run, target);
+        StringBuilder      log          = this.getLog(run, target);
 
         jobState.setName( job.getName());
         jobState.setUrl( job.getUrl());
@@ -121,27 +121,26 @@ public enum Phase {
         return jobState;
     }
 
-    private String getLog(Run run, Endpoint target) {
-        String log = "";
+    private StringBuilder getLog(Run run, Endpoint target) {
+        StringBuilder log = new StringBuilder("");
         Integer loglines = target.getLoglines();
         try {
             switch (loglines) {
                 // The full log
                 case -1:
-                    log = run.getLog();
+                    log = log.append(run.getLog());
                     break;
                 // No log
                 case 0:
-                    log = "";
                     break;
                 default:
                     List<String> logEntries = run.getLog(loglines);
                     for (String entry: logEntries) {
-                        log += entry + "\n";
+                        log.append(entry + "\n");
                     }
             }
         } catch (IOException e) {
-            log = "Unable to retrieve log";
+            log.append("Unable to retrieve log");
         }
         return log;
     }
