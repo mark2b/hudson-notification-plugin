@@ -124,6 +124,11 @@ public enum Phase {
     private StringBuilder getLog(Run run, Endpoint target) {
         StringBuilder log = new StringBuilder("");
         Integer loglines = target.getLoglines();
+
+        if (null == loglines) {
+                loglines = 0;
+        }
+
         try {
             switch (loglines) {
                 // The full log
