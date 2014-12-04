@@ -141,7 +141,8 @@ public enum Phase {
                 default:
                     List<String> logEntries = run.getLog(loglines);
                     for (String entry: logEntries) {
-                        log.append(entry + "\n");
+                        log.append(entry);
+                        log.append("\n");
                     }
             }
         } catch (IOException e) {
