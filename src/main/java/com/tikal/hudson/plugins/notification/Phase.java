@@ -126,17 +126,14 @@ public enum Phase {
         Integer loglines = target.getLoglines();
 
         if (null == loglines) {
-                loglines = 0;
+                return log;
         }
 
         try {
             switch (loglines) {
                 // The full log
                 case -1:
-                    log = log.append(run.getLog());
-                    break;
-                // No log
-                case 0:
+                    log.append(run.getLog());
                     break;
                 default:
                     List<String> logEntries = run.getLog(loglines);
