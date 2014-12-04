@@ -35,13 +35,16 @@ public class Endpoint {
 
     private Integer timeout = DEFAULT_TIMEOUT;
 
+    private Integer loglines = 0;
+
     @DataBoundConstructor
-    public Endpoint(Protocol protocol, String url, String event, Format format, Integer timeout) {
+    public Endpoint(Protocol protocol, String url, String event, Format format, Integer timeout, Integer loglines) {
         setProtocol( protocol );
         setUrl( url );
         setEvent( event );
         setFormat( format );
         setTimeout( timeout );
+        setLoglines( loglines );
     }
 
     public int getTimeout() {
@@ -85,6 +88,14 @@ public class Endpoint {
 
     public void setFormat(Format format) {
         this.format = format;
+    }
+
+    public Integer getLoglines() {
+        return this.loglines;
+    }
+
+    public void setLoglines(Integer loglines) {
+        this.loglines = loglines;
     }
 
     public FormValidation doCheckURL(@QueryParameter(value = "url", fixEmpty = true) String url) {

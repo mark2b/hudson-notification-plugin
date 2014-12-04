@@ -21,6 +21,7 @@ import hudson.model.*;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -38,7 +39,7 @@ public enum Phase {
                 listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
 
                 try {
-                    JobState jobState = buildJobState(run.getParent(), run, listener);
+                    JobState jobState = buildJobState(run.getParent(), run, listener, target);
                     target.getProtocol().send(target.getUrl(),
                                               target.getFormat().serialize(jobState),
                                               target.getTimeout(),
@@ -61,7 +62,7 @@ public enum Phase {
         return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()));
     }
 
-    private JobState buildJobState(Job job, Run run, TaskListener listener)
+    private JobState buildJobState(Job job, Run run, TaskListener listener, Endpoint target)
         throws IOException, InterruptedException
     {
 
@@ -73,6 +74,7 @@ public enum Phase {
         Result             result       = run.getResult();
         ParametersAction   paramsAction = run.getAction(ParametersAction.class);
         EnvVars            environment  = run.getEnvironment( listener );
+        StringBuilder      log          = this.getLog(run, target);
 
         jobState.setName( job.getName());
         jobState.setUrl( job.getUrl());
@@ -82,6 +84,7 @@ public enum Phase {
         buildState.setUrl( run.getUrl());
         buildState.setPhase( this );
         buildState.setScm( scmState );
+        buildState.setLog( log );
 
         if ( result != null ) {
             buildState.setStatus(result.toString());
@@ -116,5 +119,32 @@ public enum Phase {
         }
 
         return jobState;
+    }
+
+    private StringBuilder getLog(Run run, Endpoint target) {
+        StringBuilder log = new StringBuilder("");
+        Integer loglines = target.getLoglines();
+
+        if (null == loglines) {
+                return log;
+        }
+
+        try {
+            switch (loglines) {
+                // The full log
+                case -1:
+                    log.append(run.getLog());
+                    break;
+                default:
+                    List<String> logEntries = run.getLog(loglines);
+                    for (String entry: logEntries) {
+                        log.append(entry);
+                        log.append("\n");
+                    }
+            }
+        } catch (IOException e) {
+            log.append("Unable to retrieve log");
+        }
+        return log;
     }
 }
