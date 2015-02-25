@@ -34,7 +34,7 @@ public enum Phase {
         HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
         if ( property == null ){ return; }
         
-        EnvVar environment = run.getEnvironment(listener);
+        EnvVars environment = run.getEnvironment(listener);
 
         for ( Endpoint target : property.getEndpoints()) {
             if ( isRun( target )) {
