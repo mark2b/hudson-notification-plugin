@@ -35,6 +35,8 @@ public class BuildState {
 
     private int number;
 
+    private long queueId;
+
     private Phase phase;
 
     private String status;
@@ -67,6 +69,14 @@ public class BuildState {
 
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    public long getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(long queue) {
+        this.queueId = queue;
     }
 
     public Phase getPhase() {
