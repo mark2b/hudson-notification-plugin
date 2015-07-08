@@ -83,6 +83,7 @@ public enum Phase {
         jobState.setBuild( buildState );
 
         buildState.setNumber( run.number );
+        buildState.setQueueId( run.getQueueId() );
         buildState.setUrl( run.getUrl());
         buildState.setPhase( this );
         buildState.setScm( scmState );
