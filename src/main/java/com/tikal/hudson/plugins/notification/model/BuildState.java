@@ -168,7 +168,7 @@ public class BuildState {
 
         for ( Run.Artifact a : buildArtifacts ) {
             String artifactUrl = Jenkins.getInstance().getRootUrl() + run.getUrl() + "artifact/" + a.getHref();
-            updateArtifact( a.getFileName(), "archive", artifactUrl );
+            updateArtifact( a.relativePath, "archive", artifactUrl );
         }
     }
 
