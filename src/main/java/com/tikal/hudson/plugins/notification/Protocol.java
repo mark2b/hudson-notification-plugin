@@ -14,20 +14,12 @@
 package com.tikal.hudson.plugins.notification;
 
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.Proxy;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
+import jenkins.model.Jenkins;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.*;
 
 
 public enum Protocol {
@@ -73,17 +65,16 @@ public enum Protocol {
               }
             }
 
-            HttpURLConnection connection = null;
-            if (proxyUrl == null) {
-              connection = (HttpURLConnection) targetUrl.openConnection();
-
-            } else {
+            Proxy proxy = Proxy.NO_PROXY;
+            if (proxyUrl != null) {
               // Proxy connection to the address provided
               final int proxyPort = proxyUrl.getPort() > 0 ? proxyUrl.getPort() : 80;
-              Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyUrl.getHost(), proxyPort));
-              connection = (HttpURLConnection) targetUrl.openConnection(proxy);
+              proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyUrl.getHost(), proxyPort));
+            } else if (Jenkins.getInstance() != null && Jenkins.getInstance().proxy != null) {
+              proxy = Jenkins.getInstance().proxy.createProxy(targetUrl.getHost());
             }
 
+            HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection(proxy);
             connection.setRequestProperty("Content-Type", String.format( "application/%s;charset=UTF-8", isJson ? "json" : "xml" ));
             String userInfo = targetUrl.getUserInfo();
             if (null != userInfo) {
