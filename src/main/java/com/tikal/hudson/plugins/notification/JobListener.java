@@ -28,17 +28,17 @@ public class JobListener extends RunListener<Run> {
 
     @Override
     public void onStarted(Run r, TaskListener listener) {
-        Phase.STARTED.handle(r, listener);
+        Phase.STARTED.handle(r, listener, r.getTimeInMillis());
     }
 
     @Override
     public void onCompleted(Run r, TaskListener listener) {
-        Phase.COMPLETED.handle(r, listener);
+        Phase.COMPLETED.handle(r, listener, r.getTimeInMillis() + r.getDuration());
     }
 
     @Override
     public void onFinalized(Run r) {
-        Phase.FINALIZED.handle(r, TaskListener.NULL);
+        Phase.FINALIZED.handle(r, TaskListener.NULL, System.currentTimeMillis());
     }
 
 }

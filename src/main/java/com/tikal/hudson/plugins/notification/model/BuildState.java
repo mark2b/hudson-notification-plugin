@@ -37,6 +37,8 @@ public class BuildState {
 
     private long queueId;
 
+    private long timestamp; 
+
     private Phase phase;
 
     private String status;
@@ -77,6 +79,14 @@ public class BuildState {
 
     public void setQueueId(long queue) {
         this.queueId = queue;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Phase getPhase() {

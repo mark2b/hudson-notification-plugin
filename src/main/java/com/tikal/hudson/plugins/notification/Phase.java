@@ -29,7 +29,7 @@ public enum Phase {
     STARTED, COMPLETED, FINALIZED;
 
     @SuppressWarnings( "CastToConcreteClass" )
-    public void handle(Run run, TaskListener listener) {
+    public void handle(Run run, TaskListener listener, long timestamp) {
 
         HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
         if ( property == null ){ return; }
@@ -39,7 +39,7 @@ public enum Phase {
                 listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
 
                 try {
-                    JobState jobState = buildJobState(run.getParent(), run, listener, target);
+                    JobState jobState = buildJobState(run.getParent(), run, listener, timestamp, target);
                     EnvVars environment = run.getEnvironment(listener);
                     String expandedUrl = environment.expand(target.getUrl());
                     target.getProtocol().send(expandedUrl,
@@ -64,7 +64,7 @@ public enum Phase {
         return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()));
     }
 
-    private JobState buildJobState(Job job, Run run, TaskListener listener, Endpoint target)
+    private JobState buildJobState(Job job, Run run, TaskListener listener, long timestamp, Endpoint target)
         throws IOException, InterruptedException
     {
 
@@ -86,6 +86,7 @@ public enum Phase {
         buildState.setQueueId( run.getQueueId() );
         buildState.setUrl( run.getUrl());
         buildState.setPhase( this );
+        buildState.setTimestamp( timestamp );
         buildState.setScm( scmState );
         buildState.setLog( log );
 
