@@ -26,7 +26,7 @@ import java.util.List;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public enum Phase {
-    STARTED, COMPLETED, FINALIZED;
+    QUEUED, STARTED, COMPLETED, FINALIZED;
 
     @SuppressWarnings( "CastToConcreteClass" )
     public void handle(Run run, TaskListener listener, long timestamp) {

@@ -34,6 +34,7 @@
                                     <f:entry title="Event" description="Job lifecycle event triggering notification" field="event">
                                         <select class="setting-input" name="event">
                                             <f:option value="all"       selected="${endpoint.event == 'all'}">All Events</f:option>
+                                            <f:option value="queued"    selected="${endpoint.event == 'queued'}">Job Queued</f:option>
                                             <f:option value="started"   selected="${endpoint.event == 'started'}">Job Started</f:option>
                                             <f:option value="completed" selected="${endpoint.event == 'completed'}">Job Completed</f:option>
                                             <f:option value="finalized" selected="${endpoint.event == 'finalized'}">Job Finalized</f:option>
