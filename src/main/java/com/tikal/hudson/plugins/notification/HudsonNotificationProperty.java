@@ -13,7 +13,7 @@
  */
 package com.tikal.hudson.plugins.notification;
 
-import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.model.JobProperty;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HudsonNotificationProperty extends
-        JobProperty<AbstractProject<?, ?>> {
+        JobProperty<Job<?, ?>> {
 
     public final List<Endpoint> endpoints;
 

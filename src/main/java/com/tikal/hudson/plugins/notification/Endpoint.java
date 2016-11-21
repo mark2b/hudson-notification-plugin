@@ -14,37 +14,55 @@
 
 package com.tikal.hudson.plugins.notification;
 
-import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
 public class Endpoint {
 
     public static final Integer DEFAULT_TIMEOUT = 30000;
+    
+    public static final Integer DEFAULT_RETRIES = 0;
 
     private Protocol protocol;
-
+    
     /**
      * json as default
      */
     private Format format = Format.JSON;
-
-    private String url;
+    
+    private UrlInfo urlInfo;
+    
+    // For backwards compatbility
+    @Deprecated
+    private transient String url;
 
     private String event = "all";
 
     private Integer timeout = DEFAULT_TIMEOUT;
 
     private Integer loglines = 0;
+    
+    private Integer retries = DEFAULT_RETRIES;
 
     @DataBoundConstructor
-    public Endpoint(Protocol protocol, String url, String event, Format format, Integer timeout, Integer loglines) {
+    public Endpoint(Protocol protocol, UrlInfo urlInfo, String event, Format format, Integer timeout, Integer loglines, Integer retries) {
         setProtocol( protocol );
-        setUrl( url );
         setEvent( event );
         setFormat( format );
         setTimeout( timeout );
+        setUrlInfo ( urlInfo );
         setLoglines( loglines );
+        setRetries( retries );
+    }
+
+    public UrlInfo getUrlInfo() {
+        if (this.urlInfo == null) {
+            this.urlInfo = new UrlInfo(UrlType.PUBLIC, "");
+        }
+        return this.urlInfo;
+    }
+
+    public void setUrlInfo(UrlInfo urlInfo) {
+        this.urlInfo = urlInfo;
     }
 
     public int getTimeout() {
@@ -63,14 +81,6 @@ public class Endpoint {
         this.protocol = protocol;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getEvent (){
         return event;
     }
@@ -78,7 +88,7 @@ public class Endpoint {
     public void setEvent ( String event ){
         this.event = event;
     }
-
+    
     public Format getFormat() {
         if (this.format==null){
             this.format = Format.JSON;
@@ -98,19 +108,28 @@ public class Endpoint {
         this.loglines = loglines;
     }
 
-    public FormValidation doCheckURL(@QueryParameter(value = "url", fixEmpty = true) String url) {
-        if (url.equals("111"))
-            return FormValidation.ok();
-        else
-            return FormValidation.error("There's a problem here");
-    }
-
     public boolean isJson() {
         return getFormat() == Format.JSON;
+    }
+    
+    public Integer getRetries() {
+        return this.retries == null ? DEFAULT_RETRIES : this.retries;
+    }
+    
+    public void setRetries(Integer retries) {
+        this.retries = retries;
+    }
+    
+    protected Object readResolve() {
+        if (url != null) {
+           // Upgrade, this is a public URL
+           this.urlInfo = new UrlInfo(UrlType.PUBLIC, url);
+        }
+        return this;
     }
 
     @Override
     public String toString() {
-        return protocol+":"+url;
+        return protocol+":"+urlInfo.getUrlOrId();
     }
 }

@@ -35,22 +35,49 @@ public enum Phase {
         if ( property == null ){ return; }
         
         for ( Endpoint target : property.getEndpoints()) {
-            if (isRun(target) && !target.getUrl().isEmpty()) {
-                listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
-
-                try {
-                    JobState jobState = buildJobState(run.getParent(), run, listener, target);
-                    EnvVars environment = run.getEnvironment(listener);
-                    String expandedUrl = environment.expand(target.getUrl());
-                    target.getProtocol().send(expandedUrl,
-                                              target.getFormat().serialize(jobState),
-                                              target.getTimeout(),
-                                              target.isJson());
-                } catch (Throwable error) {
-                    error.printStackTrace( listener.error( String.format( "Failed to notify endpoint '%s'", target )));
-                    listener.getLogger().println( String.format( "Failed to notify endpoint '%s' - %s: %s",
-                                                                 target, error.getClass().getName(), error.getMessage()));
+            if ( isRun( target ) && !Utils.isEmpty(target.getUrlInfo().getUrlOrId())) {
+                int triesRemaining = target.getRetries();
+                boolean failed = false;
+                do {
+                    // Represents a string that will be put into the log
+                    // if there is an error contacting the target.
+                    String urlIdString = "url 'unknown'";
+                    try {
+                        EnvVars environment = run.getEnvironment(listener);
+                        // Expand out the URL from environment + url.
+                        String expandedUrl;
+                        UrlInfo urlInfo = target.getUrlInfo();
+                        switch (urlInfo.getUrlType()) {
+                            case PUBLIC:
+                                expandedUrl = environment.expand(urlInfo.getUrlOrId());
+                                urlIdString = String.format("url '%s'", expandedUrl);
+                                break;
+                            case SECRET:
+                                String urlSecretId = urlInfo.getUrlOrId();
+                                String actualUrl = Utils.getSecretUrl(urlSecretId);
+                                expandedUrl = environment.expand(actualUrl);
+                                urlIdString = String.format("credentials id '%s'", urlSecretId);
+                                break;
+                            default:
+                                throw new UnsupportedOperationException("Unknown URL type");
+                        }
+                        listener.getLogger().println( String.format( "Notifying endpoint with %s", urlIdString));
+                        JobState jobState = buildJobState(run.getParent(), run, listener, target);
+                        target.getProtocol().send(expandedUrl,
+                                                  target.getFormat().serialize(jobState),
+                                                  target.getTimeout(),
+                                                  target.isJson());
+                    } catch (Throwable error) {
+                        failed = true;
+                        error.printStackTrace( listener.error( String.format( "Failed to notify endpoint with %s", urlIdString)));
+                        listener.getLogger().println( String.format( "Failed to notify endpoint with %s - %s: %s",
+                                                                     urlIdString, error.getClass().getName(), error.getMessage()));
+                        if (triesRemaining > 0) {
+                            listener.getLogger().println( String.format( "Reattempting to notify endpoint with %s (%d tries remaining)", urlIdString, triesRemaining));
+                        }
+                    }
                 }
+                while (failed && --triesRemaining >= 0);
             }
         }
     }
@@ -128,8 +155,8 @@ public enum Phase {
         StringBuilder log = new StringBuilder("");
         Integer loglines = target.getLoglines();
 
-        if (null == loglines) {
-                return log;
+        if (loglines == null || loglines == 0) {
+            return log;
         }
 
         try {
