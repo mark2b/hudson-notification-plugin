@@ -35,7 +35,7 @@ public enum Phase {
         if ( property == null ){ return; }
         
         for ( Endpoint target : property.getEndpoints()) {
-            if ( isRun( target )) {
+            if (isRun(target) && !target.getUrl().isEmpty()) {
                 listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
 
                 try {
