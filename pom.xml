@@ -136,6 +136,12 @@
             <organization>AKQA</organization>
             <organizationUrl>http://akqa.com</organizationUrl>
         </developer>
+        <developer>
+            <id>cohencil</id>
+            <name>Chen Cohen</name>
+            <email>chenc@tikalk.com</email>
+            <organizationUrl>http://tikalk.com</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
