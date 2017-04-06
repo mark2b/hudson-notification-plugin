@@ -76,6 +76,10 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
         return Endpoint.DEFAULT_TIMEOUT;
     }
     
+    public int getDefaultRetries(){
+        return Endpoint.DEFAULT_RETRIES;
+    }
+
     @Override
     public HudsonNotificationProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         List<Endpoint> endpoints = new ArrayList<Endpoint>();
