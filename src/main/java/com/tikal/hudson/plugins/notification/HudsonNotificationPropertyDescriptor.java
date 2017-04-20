@@ -114,15 +114,13 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
         else {
             throw new FormException("Expected either a public url or secret url id", "urlInfo");
         }
-        Endpoint endpoint = new Endpoint(
-            Protocol.valueOf(endpointObjectData.getString("protocol")),
-            urlInfo,
-            endpointObjectData.getString("event"),
-            Format.valueOf(endpointObjectData.getString("format")),
-            endpointObjectData.getInt("timeout"),
-            endpointObjectData.getInt("loglines"),
-            endpointObjectData.getInt("retries")
-        );
+        Endpoint endpoint = new Endpoint(urlInfo);
+        endpoint.setEvent(endpointObjectData.getString("event"));
+        endpoint.setFormat(Format.valueOf(endpointObjectData.getString("format")));
+        endpoint.setProtocol(Protocol.valueOf(endpointObjectData.getString("protocol")));
+        endpoint.setTimeout(endpointObjectData.getInt("timeout"));
+        endpoint.setRetries(endpointObjectData.getInt("retries"));
+        endpoint.setLoglines(endpointObjectData.getInt("loglines"));
         return endpoint;
     }
     

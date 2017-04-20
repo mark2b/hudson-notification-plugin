@@ -151,6 +151,8 @@ public class BuildState {
 
     /**
      * Updates artifacts Map with S3 links, if corresponding publisher is available.
+     * @param job Job to update
+     * @param run Run to update
      */
     public void updateArtifacts ( Job job, Run run )
     {
