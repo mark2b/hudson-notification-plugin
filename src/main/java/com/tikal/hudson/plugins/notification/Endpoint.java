@@ -23,7 +23,7 @@ public class Endpoint {
     
     public static final Integer DEFAULT_RETRIES = 0;
 
-    private Protocol protocol;
+    private Protocol protocol = Protocol.HTTP;
     
     /**
      * json as default
