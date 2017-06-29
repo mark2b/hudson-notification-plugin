@@ -20,6 +20,8 @@ public class JobState {
 
     private String name;
 
+    private String displayName;
+
     private String url;
 
     private BuildState build;
@@ -30,6 +32,14 @@ public class JobState {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getUrl() {

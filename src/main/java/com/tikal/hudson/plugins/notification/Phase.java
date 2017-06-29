@@ -79,6 +79,7 @@ public enum Phase {
         StringBuilder      log          = this.getLog(run, target);
 
         jobState.setName( job.getName());
+        jobState.setDisplayName(job.getDisplayName());
         jobState.setUrl( job.getUrl());
         jobState.setBuild( buildState );
 
