@@ -16,6 +16,7 @@ package com.tikal.hudson.plugins.notification;
 import hudson.Extension;
 import hudson.model.TaskListener;
 import hudson.model.Run;
+import hudson.model.Executor;
 import hudson.model.listeners.RunListener;
 
 @Extension
@@ -28,17 +29,19 @@ public class JobListener extends RunListener<Run> {
 
     @Override
     public void onStarted(Run r, TaskListener listener) {
-        Phase.STARTED.handle(r, listener);
+        Executor e = r.getExecutor();
+        Phase.QUEUED.handle(r, TaskListener.NULL, e != null ? System.currentTimeMillis() - e.getTimeSpentInQueue() : 0L);
+        Phase.STARTED.handle(r, listener, r.getTimeInMillis());
     }
 
     @Override
     public void onCompleted(Run r, TaskListener listener) {
-        Phase.COMPLETED.handle(r, listener);
+        Phase.COMPLETED.handle(r, listener, r.getTimeInMillis() + r.getDuration());
     }
 
     @Override
     public void onFinalized(Run r) {
-        Phase.FINALIZED.handle(r, TaskListener.NULL);
+        Phase.FINALIZED.handle(r, TaskListener.NULL, System.currentTimeMillis());
     }
 
 }
