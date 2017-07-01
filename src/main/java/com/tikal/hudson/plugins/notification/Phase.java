@@ -35,7 +35,7 @@ public enum Phase {
         if ( property == null ){ return; }
         
         for ( Endpoint target : property.getEndpoints()) {
-            if (isRun(target) && !target.getUrl().isEmpty()) {
+            if (isRun(target, run.getResult()) && !target.getUrl().isEmpty()) {
                 listener.getLogger().println( String.format( "Notifying endpoint '%s'", target ));
 
                 try {
@@ -59,9 +59,17 @@ public enum Phase {
     /**
      * Determines if the endpoint specified should be notified at the current job phase.
      */
-    private boolean isRun( Endpoint endpoint ) {
+    private boolean isRun( Endpoint endpoint, Result result ) {
         String event = endpoint.getEvent();
-        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()));
+        
+        String status = "";
+        if ( result != null ) {
+            status = result.toString();
+        }
+        
+        boolean buildFailed = event.equals("failed") && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
+        		
+        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed);
     }
 
     private JobState buildJobState(Job job, Run run, TaskListener listener, Endpoint target)
