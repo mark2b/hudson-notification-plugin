@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
 
     <f:section title="Job Notifications">
         <f:entry title="Notification Endpoints" field="endpoints">
@@ -46,16 +46,31 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <f:entry title="URL" description="Where to send messages" field="url">
-                                        <f:textbox name="url" value="${endpoint.url}" />
+                                    <f:dropdownList name="urlInfo" field="urlInfo" title="URL Source">
+                                        <f:dropdownListBlock name="urlInfo" title="Plain Text" selected="${endpoint.getUrlInfo().getUrlType() == 'PUBLIC'}">
+                                            <f:entry title="URL" description="Where to send messages" field="publicUrl">
+                                                <f:textbox name="publicUrl" value="${endpoint.getUrlInfo().getUrlOrId()}" />
+                                            </f:entry>
+                                        </f:dropdownListBlock>
+                                        <f:dropdownListBlock name="urlInfo" title="Credentials Store" selected="${endpoint.getUrlInfo().getUrlType() == 'SECRET'}">
+                                            <f:entry title="URL" description="Where to send messages" field="secretUrl">
+                                                <c:select expressionAllowed="false" value="${endpoint.getUrlInfo().getUrlOrId()}"/>
+                                            </f:entry>
+                                        </f:dropdownListBlock>
+                                    </f:dropdownList>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Timeout" description="Timeout (in ms)" field="timeout">
+                                        <f:textbox name="timeout" value="${endpoint.timeout}" default="${descriptor.defaultTimeout}"/>
                                     </f:entry>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <f:entry title="Timeout" description="Timeout (in ms)"
-                                        field="timeout">
-                                        <f:textbox name="timeout" value="${endpoint.timeout}" default="${descriptor.defaultTimeout}"/>
+                                    <f:entry title="Retries" description="Retries" field="retries">
+                                        <f:textbox name="retries" value="${endpoint.retries}" default="${descriptor.defaultRetries}"/>
                                     </f:entry>
                                 </td>
                             </tr>
