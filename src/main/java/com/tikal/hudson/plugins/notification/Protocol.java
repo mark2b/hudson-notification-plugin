@@ -115,12 +115,14 @@ public enum Protocol {
 
         @Override
         public void validateUrl( String url ) {
-            try {
-                // noinspection ResultOfObjectAllocationIgnored
-                new URL( url );
-            } catch ( MalformedURLException e ) {
-                throw new RuntimeException( String.format( "%sUse http://hostname:port/path for endpoint URL",
-                                                           isEmpty ( url ) ? "" : "Invalid URL '" + url + "'. " ));
+            //do not validate if Jenkins Variable use used.
+            if (!url.contains("$")) {
+                try {
+                    // noinspection ResultOfObjectAllocationIgnored
+                    new URL(url);
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(String.format("%sUse http://hostname:port/path for endpoint URL", isEmpty(url) ? "" : "Invalid URL '" + url + "'. "));
+                }
             }
         }
     };

@@ -61,6 +61,11 @@ public enum Phase {
                             default:
                                 throw new UnsupportedOperationException("Unknown URL type");
                         }
+                        //If Jenkins variable was used for URL, and it was unresolvable, ignore and return.
+                        if (Utils.isEmpty(expandedUrl) || expandedUrl.contains("$")) {
+                            return;
+                        }
+
                         listener.getLogger().println( String.format( "Notifying endpoint with %s", urlIdString));
                         JobState jobState = buildJobState(run.getParent(), run, listener, timestamp, target);
                         target.getProtocol().send(expandedUrl,
