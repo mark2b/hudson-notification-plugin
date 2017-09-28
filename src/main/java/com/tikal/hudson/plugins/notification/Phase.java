@@ -62,7 +62,8 @@ public enum Phase {
                                 throw new UnsupportedOperationException("Unknown URL type");
                         }
                         //If Jenkins variable was used for URL, and it was unresolvable, ignore and return.
-                        if (Utils.isEmpty(expandedUrl) || expandedUrl.contains("$")) {
+                        if (expandedUrl.contains("$")) {
+                            listener.getLogger().println( String.format( "Ignoring sending notification due to unresolved variable: %s", urlIdString));
                             return;
                         }
 
