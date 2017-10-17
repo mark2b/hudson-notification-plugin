@@ -17,10 +17,17 @@ import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
 import com.tikal.hudson.plugins.notification.model.ScmState;
 import hudson.EnvVars;
-import hudson.model.*;
+import hudson.model.Job;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 
 
@@ -61,9 +68,8 @@ public enum Phase {
                             default:
                                 throw new UnsupportedOperationException("Unknown URL type");
                         }
-                        //If Jenkins variable was used for URL, and it was unresolvable, ignore and return.
-                        if (expandedUrl.contains("$")) {
-                            listener.getLogger().println( String.format( "Ignoring sending notification due to unresolved variable: %s", urlIdString));
+
+                        if(! isURLValid(urlIdString, expandedUrl, listener.getLogger())){
                             return;
                         }
 
@@ -87,6 +93,28 @@ public enum Phase {
             }
         }
     }
+
+    /**
+     * Determines if input value for URL is valid. Valid values are not blank, and variables resolve/expand into valid URLs.
+     * Unresolved variables remain as strings prefixed with $, so those are not valid.
+     * @param urlInputValue Value user provided in input box for URL
+     * @param expandedUrl Value the urlInputValue  'expands' into.
+     * @param logger PrintStream used for logging.
+     * @return True if URL is populated with a non-blank value, or a variable that expands into a URL.
+     */
+    private boolean isURLValid(String urlInputValue, String expandedUrl, PrintStream logger){
+        boolean isValid= false;
+        //If Jenkins variable was used for URL, and it was unresolvable, log warning and return.
+        if (expandedUrl.contains("$")) {
+            logger.println( String.format( "Ignoring sending notification due to unresolved variable: %s", urlInputValue));
+        }else if(StringUtils.isBlank(expandedUrl)){
+            logger.println("URL is not set, ignoring call to send notification.");
+        }else{
+            isValid=true;
+        }
+        return isValid;
+    }
+
 
 
     /**

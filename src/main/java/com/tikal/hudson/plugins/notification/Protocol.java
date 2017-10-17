@@ -115,7 +115,7 @@ public enum Protocol {
 
         @Override
         public void validateUrl( String url ) {
-            //do not validate if Jenkins Variable use used.
+            //do not validate if Jenkins Variable is used.
             if (!url.contains("$")) {
                 try {
                     // noinspection ResultOfObjectAllocationIgnored
