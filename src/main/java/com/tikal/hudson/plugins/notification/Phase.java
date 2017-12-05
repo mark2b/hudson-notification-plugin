@@ -16,9 +16,18 @@ package com.tikal.hudson.plugins.notification;
 import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
 import com.tikal.hudson.plugins.notification.model.ScmState;
+
 import hudson.EnvVars;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.Job;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
+
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 
 import java.io.IOException;
 import java.util.List;
@@ -125,6 +134,7 @@ public enum Phase {
         buildState.setTimestamp( timestamp );
         buildState.setScm( scmState );
         buildState.setLog( log );
+        buildState.setNotes(resolveMacros(run, listener, target.getBuildNotes()));
 
         if ( result != null ) {
             buildState.setStatus(result.toString());
@@ -159,6 +169,20 @@ public enum Phase {
         }
 
         return jobState;
+    }
+
+    private String resolveMacros(Run build, TaskListener listener, String text) {
+
+        String result = text;
+        try {
+            result = TokenMacro.expandAll((AbstractBuild<?, ?>) build, listener, text);
+        } catch (Throwable e) {
+            // Catching Throwable here because the TokenMacro plugin is optional
+            // so will throw a ClassDefNotFoundError if the plugin is not installed or disabled.
+            listener.getLogger().println("Failed to evaluate macro '" + text + "'");
+        }
+
+        return result;
     }
 
     private StringBuilder getLog(Run run, Endpoint target) {

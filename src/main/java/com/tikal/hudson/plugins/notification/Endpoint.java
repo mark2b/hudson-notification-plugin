@@ -41,6 +41,8 @@ public class Endpoint {
     private Integer timeout = DEFAULT_TIMEOUT;
 
     private Integer loglines = 0;
+
+    private String buildNotes;
     
     private Integer retries = DEFAULT_RETRIES;
 
@@ -150,6 +152,19 @@ public class Endpoint {
     @DataBoundSetter
     public void setLoglines(Integer loglines) {
         this.loglines = loglines;
+    }
+
+    public String getBuildNotes() {
+        return buildNotes;
+    }
+
+    /**
+     * Set any additional build information to be sent in message.
+     * @param buildNotes - the additional data
+     */
+    @DataBoundSetter
+    public void setBuildNotes(String buildNotes) {
+        this.buildNotes = buildNotes;
     }
 
     public boolean isJson() {

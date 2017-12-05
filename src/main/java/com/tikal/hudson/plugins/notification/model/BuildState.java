@@ -24,7 +24,6 @@ import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 
 import java.io.File;
-import java.lang.StringBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,9 @@ public class BuildState {
     private Map<String, String> parameters;
 
     private StringBuilder log;
+
+    private String notes;
+
 
     /**
      *  Map of artifacts: file name => Map of artifact locations ( location name => artifact URL )
@@ -157,6 +159,14 @@ public class BuildState {
 
     public void setLog(StringBuilder log) {
         this.log = log;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String buildNotes) {
+        this.notes = buildNotes;
     }
 
     /**
