@@ -26,6 +26,8 @@ public class ScmState
 
     private List<String> changes;
 
+    private List<String> culprits;
+
     public String getUrl ()
     {
         return url;
@@ -62,5 +64,13 @@ public class ScmState
 
     public void setChanges(List<String> changes) {
         this.changes = changes;
+    }
+
+    public List<String> getCulprits() {
+        return culprits;
+    }
+
+    public void setCulprits(List<String> culprits) {
+        this.culprits = culprits;
     }
 }

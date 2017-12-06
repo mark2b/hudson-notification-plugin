@@ -26,6 +26,7 @@ import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.User;
 import hudson.scm.ChangeLogSet;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
@@ -36,6 +37,7 @@ import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -175,6 +177,7 @@ public enum Phase {
         }
 
         scmState.setChanges(getChangedFiles(run));
+        scmState.setCulprits(getCulprits(run));
 
         return jobState;
     }
@@ -244,6 +247,20 @@ public enum Phase {
         }
 
         return affectedPaths;
+    }
+
+    private List<String> getCulprits(Run run) {
+        List<String> culprits = new ArrayList<>();
+
+        if(run instanceof AbstractBuild) {
+            AbstractBuild build = (AbstractBuild) run;
+            Set<User> buildCulprits = build.getCulprits();
+            for(User user : buildCulprits) {
+                culprits.add(user.getId());
+            }
+        }
+
+        return culprits;
     }
 
     private StringBuilder getLog(Run run, Endpoint target) {
