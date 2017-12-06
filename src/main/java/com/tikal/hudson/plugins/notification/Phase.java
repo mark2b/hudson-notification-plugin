@@ -16,6 +16,7 @@ package com.tikal.hudson.plugins.notification;
 import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
 import com.tikal.hudson.plugins.notification.model.ScmState;
+import com.tikal.hudson.plugins.notification.model.TestState;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
@@ -25,11 +26,14 @@ import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.TestResult;
 import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -135,6 +139,7 @@ public enum Phase {
         buildState.setScm( scmState );
         buildState.setLog( log );
         buildState.setNotes(resolveMacros(run, listener, target.getBuildNotes()));
+        buildState.setTestSummary(getTestResults(run));
 
         if ( result != null ) {
             buildState.setStatus(result.toString());
@@ -183,6 +188,39 @@ public enum Phase {
         }
 
         return result;
+    }
+
+    private TestState getTestResults(Run build) {
+        TestState resultSummary = null;
+
+        AbstractTestResultAction testAction = build.getAction(AbstractTestResultAction.class);
+        if(testAction != null) {
+            int total = testAction.getTotalCount();
+            int failCount = testAction.getFailCount();
+            int skipCount = testAction.getSkipCount();
+
+            resultSummary = new TestState();
+            resultSummary.setTotal(total);
+            resultSummary.setFailed(failCount);
+            resultSummary.setSkipped(skipCount);
+            resultSummary.setPassed(total - failCount - skipCount);
+            resultSummary.setFailedTests(getFailedTestNames(testAction));
+        }
+
+
+        return resultSummary;
+    }
+
+    private List<String> getFailedTestNames(AbstractTestResultAction testResultAction) {
+        List<String> failedTests = new ArrayList<>();
+
+        List<? extends TestResult> results = testResultAction.getFailedTests();
+
+        for(TestResult t : results) {
+            failedTests.add(t.getFullName());
+        }
+
+        return failedTests;
     }
 
     private StringBuilder getLog(Run run, Endpoint target) {

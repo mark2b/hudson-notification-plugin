@@ -54,6 +54,8 @@ public class BuildState {
 
     private String notes;
 
+    private TestState testSummary;
+
 
     /**
      *  Map of artifacts: file name => Map of artifact locations ( location name => artifact URL )
@@ -167,6 +169,14 @@ public class BuildState {
 
     public void setNotes(String buildNotes) {
         this.notes = buildNotes;
+    }
+
+    public TestState getTestSummary() {
+        return testSummary;
+    }
+
+    public void setTestSummary(TestState testSummary) {
+        this.testSummary = testSummary;
     }
 
     /**
