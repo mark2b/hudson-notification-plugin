@@ -57,6 +57,8 @@ public class BuildState {
     private TestState testSummary;
 
 
+
+
     /**
      *  Map of artifacts: file name => Map of artifact locations ( location name => artifact URL )
      *  ---

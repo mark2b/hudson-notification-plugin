@@ -26,6 +26,7 @@ import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.scm.ChangeLogSet;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 import jenkins.model.Jenkins;
@@ -173,6 +174,8 @@ public enum Phase {
             scmState.setCommit( environment.get( "GIT_COMMIT" ));
         }
 
+        scmState.setChanges(getChangedFiles(run));
+
         return jobState;
     }
 
@@ -221,6 +224,26 @@ public enum Phase {
         }
 
         return failedTests;
+    }
+
+    private List<String> getChangedFiles(Run run) {
+        List<String> affectedPaths = new ArrayList<>();
+
+        if(run instanceof AbstractBuild) {
+            AbstractBuild build = (AbstractBuild) run;
+
+            Object[] items = build.getChangeSet().getItems();
+
+            if(items != null && items.length > 0) {
+                for(Object o : items) {
+                    if(o instanceof ChangeLogSet.Entry) {
+                        affectedPaths.addAll(((ChangeLogSet.Entry) o).getAffectedPaths());
+                    }
+                }
+            }
+        }
+
+        return affectedPaths;
     }
 
     private StringBuilder getLog(Run run, Endpoint target) {

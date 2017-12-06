@@ -14,6 +14,8 @@
 package com.tikal.hudson.plugins.notification.model;
 
 
+import java.util.List;
+
 public class ScmState
 {
     private String url;
@@ -21,6 +23,8 @@ public class ScmState
     private String branch;
 
     private String commit;
+
+    private List<String> changes;
 
     public String getUrl ()
     {
@@ -50,5 +54,13 @@ public class ScmState
     public void setCommit ( String commit )
     {
         this.commit = commit;
+    }
+
+    public List<String> getChanges() {
+        return changes;
+    }
+
+    public void setChanges(List<String> changes) {
+        this.changes = changes;
     }
 }
