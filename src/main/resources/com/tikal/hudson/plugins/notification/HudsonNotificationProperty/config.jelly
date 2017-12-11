@@ -86,7 +86,7 @@
                                 <td>
                                     <f:entry title="Notes" description="Additional detail about the build to include in message."
                                         field="notes">
-                                        <f:textbox name="notes" value="${endpoint.notes}" default="" />
+                                        <f:textbox name="notes" value="${endpoint.buildNotes}" default="" />
                                     </f:entry>
                                 </td>
                             </tr>
