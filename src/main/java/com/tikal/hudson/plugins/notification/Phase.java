@@ -110,7 +110,9 @@ public enum Phase {
             status = result.toString();
         }
         
-        boolean buildFailed = event.equals("failed") && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
+        boolean buildFailed = event.equals("failed") &&
+                this.toString().toLowerCase().equals("finalized") &&
+                (result == Result.UNSTABLE || result == Result.FAILURE);
         		
         return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed);
     }
