@@ -28,14 +28,28 @@ import java.util.List;
 public enum Phase {
     QUEUED, STARTED, COMPLETED, FINALIZED;
 
+	private Result findLastBuildThatFinished(Run run){
+        Run previousRun = run.getPreviousCompletedBuild();
+        while(previousRun != null){
+	        Result previousResults = previousRun.getResult();
+        	if (previousResults.equals(Result.SUCCESS) || previousResults.equals(Result.FAILURE) || previousResults.equals(Result.UNSTABLE)){
+	        	return previousResults;
+	        }
+        	previousRun = previousRun.getPreviousCompletedBuild();
+        }
+        return null;
+	}
+	
     @SuppressWarnings( "CastToConcreteClass" )
     public void handle(Run run, TaskListener listener, long timestamp) {
 
         HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
         if ( property == null ){ return; }
         
+        Result previousCompletedRunResults = findLastBuildThatFinished(run);
+        
         for ( Endpoint target : property.getEndpoints()) {
-            if (isRun(target, run.getResult()) && !Utils.isEmpty(target.getUrlInfo().getUrlOrId())) {
+            if (isRun(target, run.getResult(), previousCompletedRunResults) && !Utils.isEmpty(target.getUrlInfo().getUrlOrId())) {
                 int triesRemaining = target.getRetries();
                 boolean failed = false;
                 do {
@@ -86,7 +100,7 @@ public enum Phase {
     /**
      * Determines if the endpoint specified should be notified at the current job phase.
      */
-    private boolean isRun( Endpoint endpoint, Result result ) {
+    private boolean isRun( Endpoint endpoint, Result result, Result previousRunResult ) {
         String event = endpoint.getEvent();
         
         String status = "";
@@ -94,9 +108,13 @@ public enum Phase {
             status = result.toString();
         }
         
-        boolean buildFailed = event.equals("failed") && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
-        		
-        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed);
+		boolean firstSuccessAfterFailureNotification = event.equals("failedAndFirstSuccess")
+				&& this.toString().toLowerCase().equals("finalized") && result.equals(Result.SUCCESS)
+				&& previousRunResult.equals(Result.FAILURE);
+
+        boolean buildFailed = (event.equals("failed") || event.equals("failedAndFirstSuccess")) && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
+
+        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed || firstSuccessAfterFailureNotification);
     }
 
     private JobState buildJobState(Job job, Run run, TaskListener listener, long timestamp, Endpoint target)
