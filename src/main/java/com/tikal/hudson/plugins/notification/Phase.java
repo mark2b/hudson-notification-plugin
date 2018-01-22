@@ -109,7 +109,9 @@ public enum Phase {
         }
         
 		boolean firstSuccessAfterFailureNotification = event.equals("failedAndFirstSuccess")
-				&& this.toString().toLowerCase().equals("finalized") && result.equals(Result.SUCCESS)
+				&& this.toString().toLowerCase().equals("finalized") && result != null 
+				&& result.equals(Result.SUCCESS)
+				&& previousRunResult != null
 				&& previousRunResult.equals(Result.FAILURE);
 
         boolean buildFailed = (event.equals("failed") || event.equals("failedAndFirstSuccess")) && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
