@@ -102,21 +102,29 @@ public enum Phase {
      */
     private boolean isRun( Endpoint endpoint, Result result, Result previousRunResult ) {
         String event = endpoint.getEvent();
+
+        if(event == null)
+        	return true;
         
-        String status = "";
-        if ( result != null ) {
-            status = result.toString();
+        switch(event){
+        case "all":
+        	return true;
+        case "queued":
+        case "started":
+        case "completed":
+        case "finalized":
+        	return event.equals(this.toString().toLowerCase());
+        case "failed":
+        	if (result == null) {return false;}
+        	return this.equals(FINALIZED) && result.equals(Result.FAILURE);
+        case "failedAndFirstSuccess":
+        	if (result == null || !this.equals(FINALIZED)) {return false;}
+        	if (result.equals(Result.FAILURE)) {return true;}
+        	if (previousRunResult != null && result.equals(Result.SUCCESS) && previousRunResult.equals(Result.FAILURE)) {return true;}
+        	return false;
         }
         
-		boolean firstSuccessAfterFailureNotification = event.equals("failedAndFirstSuccess")
-				&& this.toString().toLowerCase().equals("finalized") && result != null 
-				&& result.equals(Result.SUCCESS)
-				&& previousRunResult != null
-				&& previousRunResult.equals(Result.FAILURE);
-
-        boolean buildFailed = (event.equals("failed") || event.equals("failedAndFirstSuccess")) && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
-
-        return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed || firstSuccessAfterFailureNotification);
+        return false;
     }
 
     private JobState buildJobState(Job job, Run run, TaskListener listener, long timestamp, Endpoint target)
