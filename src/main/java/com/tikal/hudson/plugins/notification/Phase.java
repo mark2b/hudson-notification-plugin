@@ -109,11 +109,6 @@ public enum Phase {
         switch(event){
         case "all":
         	return true;
-        case "queued":
-        case "started":
-        case "completed":
-        case "finalized":
-        	return event.equals(this.toString().toLowerCase());
         case "failed":
         	if (result == null) {return false;}
         	return this.equals(FINALIZED) && result.equals(Result.FAILURE);
@@ -122,9 +117,9 @@ public enum Phase {
         	if (result.equals(Result.FAILURE)) {return true;}
         	if (previousRunResult != null && result.equals(Result.SUCCESS) && previousRunResult.equals(Result.FAILURE)) {return true;}
         	return false;
+        default:
+        	return event.equals(this.toString().toLowerCase());	
         }
-        
-        return false;
     }
 
     private JobState buildJobState(Job job, Run run, TaskListener listener, long timestamp, Endpoint target)
