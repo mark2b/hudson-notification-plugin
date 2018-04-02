@@ -40,6 +40,7 @@
                                             <f:option value="completed" selected="${endpoint.event == 'completed'}">Job Completed</f:option>
                                             <f:option value="finalized" selected="${endpoint.event == 'finalized'}">Job Finalized</f:option>
                                             <f:option value="failed"	selected="${endpoint.event == 'failed'}">Job Failed</f:option>
+                                            <f:option value="failedAndFirstSuccess"	selected="${endpoint.event == 'failedAndFirstSuccess'}">Job Failed and First Success</f:option>
                                         </select>
                                     </f:entry>
                                 </td>
