@@ -16,19 +16,30 @@ package com.tikal.hudson.plugins.notification;
 import com.tikal.hudson.plugins.notification.model.BuildState;
 import com.tikal.hudson.plugins.notification.model.JobState;
 import com.tikal.hudson.plugins.notification.model.ScmState;
+import com.tikal.hudson.plugins.notification.model.TestState;
+
 import hudson.EnvVars;
+import hudson.model.AbstractBuild;
 import hudson.model.Job;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.User;
+import hudson.scm.ChangeLogSet;
+import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.TestResult;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
+
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -128,7 +139,9 @@ public enum Phase {
             status = result.toString();
         }
         
-        boolean buildFailed = event.equals("failed") && this.toString().toLowerCase().equals("finalized") && status.toLowerCase().equals("failure");
+        boolean buildFailed = event.equals("failed") &&
+                this.toString().toLowerCase().equals("finalized") &&
+                (result == Result.UNSTABLE || result == Result.FAILURE);
         		
         return (( event == null ) || event.equals( "all" ) || event.equals( this.toString().toLowerCase()) || buildFailed);
     }
@@ -159,6 +172,8 @@ public enum Phase {
         buildState.setTimestamp( timestamp );
         buildState.setScm( scmState );
         buildState.setLog( log );
+        buildState.setNotes(resolveMacros(run, listener, target.getBuildNotes()));
+        buildState.setTestSummary(getTestResults(run));
 
         if ( result != null ) {
             buildState.setStatus(result.toString());
@@ -192,7 +207,91 @@ public enum Phase {
             scmState.setCommit( environment.get( "GIT_COMMIT" ));
         }
 
+        scmState.setChanges(getChangedFiles(run));
+        scmState.setCulprits(getCulprits(run));
+
         return jobState;
+    }
+
+    private String resolveMacros(Run build, TaskListener listener, String text) {
+
+        String result = text;
+        try {
+            result = TokenMacro.expandAll((AbstractBuild<?, ?>) build, listener, text);
+        } catch (Throwable e) {
+            // Catching Throwable here because the TokenMacro plugin is optional
+            // so will throw a ClassDefNotFoundError if the plugin is not installed or disabled.
+            listener.getLogger().println("Failed to evaluate macro '" + text + "'");
+        }
+
+        return result;
+    }
+
+    private TestState getTestResults(Run build) {
+        TestState resultSummary = null;
+
+        AbstractTestResultAction testAction = build.getAction(AbstractTestResultAction.class);
+        if(testAction != null) {
+            int total = testAction.getTotalCount();
+            int failCount = testAction.getFailCount();
+            int skipCount = testAction.getSkipCount();
+
+            resultSummary = new TestState();
+            resultSummary.setTotal(total);
+            resultSummary.setFailed(failCount);
+            resultSummary.setSkipped(skipCount);
+            resultSummary.setPassed(total - failCount - skipCount);
+            resultSummary.setFailedTests(getFailedTestNames(testAction));
+        }
+
+
+        return resultSummary;
+    }
+
+    private List<String> getFailedTestNames(AbstractTestResultAction testResultAction) {
+        List<String> failedTests = new ArrayList<>();
+
+        List<? extends TestResult> results = testResultAction.getFailedTests();
+
+        for(TestResult t : results) {
+            failedTests.add(t.getFullName());
+        }
+
+        return failedTests;
+    }
+
+    private List<String> getChangedFiles(Run run) {
+        List<String> affectedPaths = new ArrayList<>();
+
+        if(run instanceof AbstractBuild) {
+            AbstractBuild build = (AbstractBuild) run;
+
+            Object[] items = build.getChangeSet().getItems();
+
+            if(items != null && items.length > 0) {
+                for(Object o : items) {
+                    if(o instanceof ChangeLogSet.Entry) {
+                        affectedPaths.addAll(((ChangeLogSet.Entry) o).getAffectedPaths());
+                    }
+                }
+            }
+        }
+
+        return affectedPaths;
+    }
+
+    private List<String> getCulprits(Run run) {
+        List<String> culprits = new ArrayList<>();
+
+        if(run instanceof AbstractBuild) {
+            AbstractBuild build = (AbstractBuild) run;
+            Set<User> buildCulprits = build.getCulprits();
+            for(User user : buildCulprits) {
+                culprits.add(user.getId());
+            }
+        }
+
+        return culprits;
     }
 
     private StringBuilder getLog(Run run, Endpoint target) {

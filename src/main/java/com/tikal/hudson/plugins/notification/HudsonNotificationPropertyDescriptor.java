@@ -19,10 +19,10 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
+import hudson.RelativePath;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobPropertyDescriptor;
-import hudson.RelativePath;
 import hudson.security.ACL;
 import hudson.security.Permission;
 import hudson.util.FormValidation;
@@ -30,15 +30,15 @@ import hudson.util.ListBoxModel;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-import org.kohsuke.stapler.AncestorInPath;
 
 @Extension
 public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescriptor {
@@ -121,6 +121,7 @@ public final class HudsonNotificationPropertyDescriptor extends JobPropertyDescr
         endpoint.setTimeout(endpointObjectData.getInt("timeout"));
         endpoint.setRetries(endpointObjectData.getInt("retries"));
         endpoint.setLoglines(endpointObjectData.getInt("loglines"));
+        endpoint.setBuildNotes(endpointObjectData.getString("notes"));
         return endpoint;
     }
     

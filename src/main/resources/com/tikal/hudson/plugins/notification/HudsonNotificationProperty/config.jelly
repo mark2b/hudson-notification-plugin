@@ -82,6 +82,15 @@
                                     </f:entry>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <f:entry title="Notes" description="Additional detail about the build to include in message."
+                                        field="notes">
+                                        <f:textbox name="notes" value="${endpoint.buildNotes}" default="" />
+                                    </f:entry>
+                                </td>
+                            </tr>
+
                         </table>
                     </f:entry>
                     <f:repeatableDeleteButton value="${%Delete}" />
