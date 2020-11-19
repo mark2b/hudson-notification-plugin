@@ -1,26 +1,26 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:p="/lib/notification">
 
     <f:section title="Job Notifications">
         <f:entry title="Notification Endpoints" field="endpoints">
             <f:repeatable name="endpoints" var="endpoint"
                 items="${instance.endpoints}" add="${%Add Endpoint}">
-                <table class="center-align">
+                <p:blockWrapperCentered>
                     <f:entry field="endpoint">
-                        <table>
-                            <tr>
-                                <td>
+                        <p:blockWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Format" description="" field="format">
                                         <select class="setting-input" name="format">
                                             <f:option value="JSON" selected="${endpoint.format=='JSON'}">JSON</f:option>
                                             <f:option value="XML" selected="${endpoint.format=='XML'}">XML</f:option>
                                         </select>
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Protocol" description="" field="protocol">
                                         <select class="setting-input" name="protocol">
                                             <f:option value="HTTP" selected="${endpoint.protocol=='HTTP'}">HTTP</f:option>
@@ -28,10 +28,10 @@
                                             <f:option value="UDP" selected="${endpoint.protocol=='UDP'}">UDP</f:option>
                                         </select>
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Event" description="Job lifecycle event triggering notification" field="event">
                                         <select class="setting-input" name="event">
                                             <f:option value="all"       selected="${endpoint.event == 'all'}">All Events</f:option>
@@ -43,10 +43,10 @@
                                             <f:option value="failedAndFirstSuccess"	selected="${endpoint.event == 'failedAndFirstSuccess'}">Job Failed and First Success</f:option>
                                         </select>
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:dropdownList name="urlInfo" field="urlInfo" title="URL Source">
                                         <f:dropdownListBlock name="urlInfo" title="Plain Text" selected="${endpoint.getUrlInfo().getUrlType() == 'PUBLIC'}">
                                             <f:entry title="URL" description="Where to send messages" field="publicUrl">
@@ -59,43 +59,42 @@
                                             </f:entry>
                                         </f:dropdownListBlock>
                                     </f:dropdownList>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Timeout" description="Timeout (in ms)" field="timeout">
                                         <f:textbox name="timeout" value="${endpoint.timeout}" default="${descriptor.defaultTimeout}"/>
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Retries" description="Retries" field="retries">
                                         <f:textbox name="retries" value="${endpoint.retries}" default="${descriptor.defaultRetries}"/>
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Log" description="Number lines of log messages to send. Use -1 for all (use with caution)."
                                         field="loglines">
                                         <f:textbox name="loglines" value="${endpoint.loglines}" default="0" />
                                     </f:entry>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                            <p:rowWrapper>
+                                <p:cellWrapper>
                                     <f:entry title="Notes" description="Additional detail about the build to include in message."
                                         field="notes">
                                         <f:textbox name="notes" value="${endpoint.buildNotes}" default="" />
                                     </f:entry>
-                                </td>
-                            </tr>
-
-                        </table>
+                                </p:cellWrapper>
+                            </p:rowWrapper>
+                        </p:blockWrapper>
                     </f:entry>
                     <f:repeatableDeleteButton value="${%Delete}" />
-                </table>
+                </p:blockWrapperCentered>
             </f:repeatable>
         </f:entry>
     </f:section>
