@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
 
-/* `buildPlugin` step provided by: https://github.com/jenkins-infra/pipeline-library */
-buildPlugin()
+// Use recommended configuration, run all tests to completion (don't fail fast)
+buildPlugin(configurations: buildPlugin.recommendedConfigurations(),
+		failFast: false)
