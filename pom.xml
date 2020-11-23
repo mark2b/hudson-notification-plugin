@@ -80,13 +80,13 @@
     </build>
 
     <dependencies>
-		<dependency>
-			<groupId>io.jenkins.tools.bom</groupId>
-			<artifactId>bom-2.235.x</artifactId>
-			<version>18</version>
-			<scope>import</scope>
-			<type>pom</type>
-		</dependency>
+        <dependency>
+            <groupId>io.jenkins.tools.bom</groupId>
+            <artifactId>bom-2.235.x</artifactId>
+            <version>18</version>
+            <scope>import</scope>
+            <type>pom</type>
+        </dependency>
         <!-- http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.google.code.gson%22%20AND%20a%3A%22gson%22 -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
