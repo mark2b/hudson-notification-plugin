@@ -1,6 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>4.13</version>
+		<relativePath />
+	</parent>
+
     <groupId>com.tikalk.hudson.plugins</groupId>
     <artifactId>notification</artifactId>
     <version>1.14-SNAPSHOT</version>
@@ -9,15 +17,11 @@
     <description>Sends notifications about jobs phases and status</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin</url>
 
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>2.9</version>
-    </parent>
-
-    <properties>
-        <findbugs.failOnError>false</findbugs.failOnError>
-    </properties>
+	<properties>
+		<jenkins.version>2.235.1</jenkins.version>
+		<java.level>8</java.level>
+		<findbugs.failOnError>false</findbugs.failOnError>
+	</properties>
 
     <repositories>
         <repository>
@@ -71,19 +75,18 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>3.0.4</version>
-					<configuration>
-						<failOnError>${maven.findbugs.failure.strict}</failOnError>
-					</configuration>
-				</plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <dependencies>
+		<dependency>
+			<groupId>io.jenkins.tools.bom</groupId>
+			<artifactId>bom-2.235.x</artifactId>
+			<version>18</version>
+			<scope>import</scope>
+			<type>pom</type>
+		</dependency>
         <!-- http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.google.code.gson%22%20AND%20a%3A%22gson%22 -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -173,14 +176,14 @@
         </developer>
     </developers>
 
-    <scm>
+	<scm>
         <connection>scm:git:git://github.com/jenkinsci/notification-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/notification-plugin.git</developerConnection>
         <url>http://github.com/jenkinsci/notification-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
-    <licenses>
+	<licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
