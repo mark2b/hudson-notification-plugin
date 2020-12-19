@@ -50,6 +50,9 @@ public enum Phase {
         Run previousRun = run.getPreviousCompletedBuild();
         while(previousRun != null){
 	        Result previousResults = previousRun.getResult();
+			if (previousResults == null) {
+				throw new IllegalStateException("Previous result can't be null here");
+			}
         	if (previousResults.equals(Result.SUCCESS) || previousResults.equals(Result.FAILURE) || previousResults.equals(Result.UNSTABLE)){
 	        	return previousResults;
 	        }
@@ -57,15 +60,15 @@ public enum Phase {
         }
         return null;
 	}
-	
+
     @SuppressWarnings( "CastToConcreteClass" )
     public void handle(Run run, TaskListener listener, long timestamp) {
 
         HudsonNotificationProperty property = (HudsonNotificationProperty) run.getParent().getProperty(HudsonNotificationProperty.class);
         if ( property == null ){ return; }
-        
+
         Result previousCompletedRunResults = findLastBuildThatFinished(run);
-        
+
         for ( Endpoint target : property.getEndpoints()) {
             if (isRun(target, run.getResult(), previousCompletedRunResults) && !Utils.isEmpty(target.getUrlInfo().getUrlOrId())) {
                 int triesRemaining = target.getRetries();
@@ -150,7 +153,7 @@ public enum Phase {
 
         if(event == null)
         	return true;
-        
+
         switch(event){
         case "all":
         	return true;
@@ -163,7 +166,7 @@ public enum Phase {
         	if (previousRunResult != null && result.equals(Result.SUCCESS) && previousRunResult.equals(Result.FAILURE)) {return true;}
         	return false;
         default:
-        	return event.equals(this.toString().toLowerCase());	
+        	return event.equals(this.toString().toLowerCase());
         }
     }
 

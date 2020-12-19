@@ -36,7 +36,7 @@ public class BuildState {
 
     private long queueId;
 
-    private long timestamp; 
+    private long timestamp;
 
     private Phase phase;
 
@@ -197,8 +197,6 @@ public class BuildState {
     {
         @SuppressWarnings( "unchecked" )
         List<Run.Artifact> buildArtifacts = run.getArtifacts();
-
-        if ( buildArtifacts == null ) { return; }
 
         for ( Run.Artifact a : buildArtifacts ) {
             String artifactUrl = Jenkins.getInstance().getRootUrl() + run.getUrl() + "artifact/" + a.getHref();
