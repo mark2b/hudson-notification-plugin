@@ -59,7 +59,7 @@ public final class Utils
                 "Some String arguments are null or empty: %s", Arrays.toString( strings )));
         }
     }
-    
+
     /**
      * Get the actual URL from the credential id
      * @param credentialId Credential id to lookup
@@ -75,10 +75,6 @@ public final class Utils
             return null;
         }
         Secret secretUrl = creds.getSecret();
-        if (secretUrl != null) {
-            return secretUrl.getPlainText();
-        }
-        
-        return "";
+		return secretUrl.getPlainText();
     }
 }
