@@ -11,7 +11,7 @@
 
     <groupId>com.tikalk.hudson.plugins</groupId>
     <artifactId>notification</artifactId>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.15-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins Notification plugin</name>
     <description>Sends notifications about jobs phases and status</description>
