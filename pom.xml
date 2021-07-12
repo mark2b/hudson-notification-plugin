@@ -11,7 +11,7 @@
 
     <groupId>com.tikalk.hudson.plugins</groupId>
     <artifactId>notification</artifactId>
-    <version>1.15</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins Notification plugin</name>
     <description>Sends notifications about jobs phases and status</description>
@@ -149,7 +149,7 @@
         <connection>scm:git:git://github.com/jenkinsci/notification-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/notification-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/notification-plugin</url>
-        <tag>notification-1.15</tag>
+        <tag>HEAD</tag>
     </scm>
 
 	<licenses>
